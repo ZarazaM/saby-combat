@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Saby Combat</title>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="{{ url_for('click_page') }}">main</a>
+            <a href="{{ url_for('profile_page') }}">profile</a>
+            <a href="{{ url_for('upgrade_page') }}">upgrades</a>
+            <select>
+                <option value="#">рейтинг</option>
+                <option value="{{ url_for('rating_page') }}">индивидуальный рейтинг</option>
+                <option value="{{ url_for('rating_page') }}">клановый рейтинг</option>
+            </select>
+            <a href="{{ url_for('friends_page') }}">friends</a>
+            <a href="{{ url_for('login_page') }}">login</a>
+<!--            {% if false %}-->
+<!--                <a href="{{ url_for('profile_page') }}">profile</a>-->
+<!--            {% else %}-->
+<!--                <a href="{{ url_for('login_page') }}">auth</a>-->
+<!--            {% endif %}-->
+            <a href="{{ url_for('admin_page') }}">admin(пока без всего)</a>
+        </nav>
+        <br>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+
+    </footer>
+
+</body>
+
+    <script>
+        const select = document.querySelector('select');
+        select.addEventListener('click', function() {
+            window.location.href = select.value
+        });
+    </script>
+</html>

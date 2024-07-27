@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Petya</td>
+        <td>101</td>
+    </tr>
+    <tr>
+        <td>Not Petya</td>
+        <td>100</td>
+    </tr>
+    <tr>
+        <td>You</td>
+        <td>99</td>
+    </tr>
+    <tr>
+        <td>Vasya</td>
+        <td>98</td>
+    </tr>
+</table>
+<input type="text" id="referal" value="somelink.fun/uopiuwqerpui00oyu"></input>
+<button type="button" onClick="copyReferal()">copy link</button>
+
+<script type="text/javascript">
+    function copyReferal() {
+    var copyText = document.getElementById("referal");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    alert("Реферальная ссылка скопирована");
+    }
+</script>
+{% endblock %}
