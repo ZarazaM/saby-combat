@@ -16,13 +16,13 @@ class Users(db.Model, UserMixin):
     role = db.Column(db.Boolean(), default=False)
     created_at = db.Column(db.DateTime(), server_default=functions.now())
     blocked = db.Column(db.Boolean(), default=False)
-    clan_id = db.Column(db.Integer())  # , db.ForeignKey('clans.id', ondelete='SET NULL'))
+    clan_id = db.Column(db.Integer())
+    referral_link = db.Column(db.String(40), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        # return self.password_hash == password для нужд проверки логина
         return check_password_hash(self.password_hash, password)
 
 
@@ -88,8 +88,18 @@ class Clans(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     clan_name = db.Column(db.String(100), unique=True, nullable=False)
     leader_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    is_open = db.Column(db.Boolean(), default=True)
+
+
+clan_invitations = db.Table('clan_invitations',
+                            db.Column('invitation_id', db.Integer, primary_key=True),
+                            db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')),
+                            db.Column('clan_id', db.Integer, db.ForeignKey('clans.id', ondelete='CASCADE')),
+                            db.Column('sender_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')),
+                            db.Column('status', db.String(20), default='pending'))
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    # Возможно переписать получение пользователя через чистый SQL запрос
     return db.session.query(Users).get(user_id)
