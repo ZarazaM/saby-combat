@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form action="/auth" method="post">
-
-    <label for="email">Email: </label>
-    <input type="text" id="email" name="email"/>
-
-    <label for="login">Login: </label>
-    <input type="text" id="login" name="login"/>
-
-    <label for="password">Password: </label>
-    <input type="password" id="password" name="password"/>
-
-    <label for="confirm_password">Password: </label>
-    <input type="password" id="confirm_password" name="confirm_password"/>
-
-    <button type="submit">Войти</button>
+<form action="" method="post">
+    {{ form.csrf_token() }}
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+    {% for field in form if field.name != "csrf_token" %}
+    <p>{{ field.label() }}</p>
+    <p>{{field}}</p>
+    {% endfor %}
 </form>
 {% endblock %}
