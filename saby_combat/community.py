@@ -15,7 +15,7 @@ from saby_combat import db
 
 app = Flask(__name__)
 
-engine = db.create_engine("postgresql+psycopg2://postgres:qwerty@localhost:5432/saby_combat", echo=True)
+engine = db.create_engine("postgresql+psycopg2://postgres:qwerty@localhost:5432/saby_combat", echo=False)
 engine.connect()
 Session = db.sessionmaker(bind=engine)
 session = db.Session()
@@ -41,6 +41,7 @@ def get_friends(user_id):
         return render_template('friends.html', friends=friends_list)
     except Exception as e:
         return f"Произошла ошибка: {e}"
+
 
 
 if __name__ == '__main__':
