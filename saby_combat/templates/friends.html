@@ -1,37 +1,93 @@
-{% extends 'base.html' %}
+<!--{% extends 'base.html' %}-->
 
-{% block content %}
-<table>
-    <tr>
-        <th>Username</th>
-        <th>Value</th>
-    </tr>
-    <tr>
-        <td>Petya</td>
-        <td>101</td>
-    </tr>
-    <tr>
-        <td>Not Petya</td>
-        <td>100</td>
-    </tr>
-    <tr>
-        <td>You</td>
-        <td>99</td>
-    </tr>
-    <tr>
-        <td>Vasya</td>
-        <td>98</td>
-    </tr>
-</table>
-<input type="text" id="referal" value="somelink.fun/uopiuwqerpui00oyu"></input>
-<button type="button" onClick="copyReferal()">copy link</button>
+<!--{% block content %}-->
+<!--<table>-->
+<!--    <tr>-->
+<!--        <th>Username</th>-->
+<!--        <th>Value</th>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Petya</td>-->
+<!--        <td>101</td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Not Petya</td>-->
+<!--        <td>100</td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>You</td>-->
+<!--        <td>99</td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Vasya</td>-->
+<!--        <td>98</td>-->
+<!--    </tr>-->
+<!--</table>-->
+<!--<input type="text" id="referal" value="somelink.fun/uopiuwqerpui00oyu"></input>-->
+<!--<button type="button" onClick="copyReferal()">copy link</button>-->
 
-<script type="text/javascript">
-    function copyReferal() {
-    var copyText = document.getElementById("referal");
-    copyText.select();
-    navigator.clipboard.writeText(copyText.value);
-    alert("Реферальная ссылка скопирована");
-    }
-</script>
-{% endblock %}
+<!--<script type="text/javascript">-->
+<!--    function copyReferal() {-->
+<!--    var copyText = document.getElementById("referal");-->
+<!--    copyText.select();-->
+<!--    navigator.clipboard.writeText(copyText.value);-->
+<!--    alert("Реферальная ссылка скопирована");-->
+<!--    }-->
+<!--</script>-->
+<!--{% endblock %}-->
+
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Список друзей</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Друзья</h1>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Имя пользователя</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Клики</th>
+                    <th>Всего монет</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for friend in friends %}
+                <tr>
+                    <td>{{ friend.username }}</td>
+                    <td>{{ friend.surname }}</td>
+                    <td>{{ friend.name }}</td>
+                    <td>{{ friend.patronymic }}</td>
+                    <td>{{ friend.click_count }}</td>
+                    <td>{{ friend.total_coins }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button id="copy-link" class="btn btn-primary mt-4">Копировать ссылку на профиль</button>
+        <input type="text" id="profile-link" value="http://localhost:5000/register?ref={{ user_id }}" style="opacity: 0; position: absolute;"> <!-- Ссылка на регистрацию -->
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('copy-link').onclick = function() {
+            var link = document.getElementById('profile-link');
+            link.style.opacity = "1"; // Делаем элемент видимым
+            link.select();
+            document.execCommand("copy");
+            alert("Ссылка скопирована!"); // Уведомление о том, что ссылка скопирована
+            link.style.opacity = "0"; // Скрываем элемент снова
+        };
+    </script>
+</body>
+</html>
