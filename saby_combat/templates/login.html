@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <form action="" method="post">
     {{ form.csrf_token() }}
     {% with messages = get_flashed_messages() %}
@@ -18,5 +17,4 @@
     <p>{{ field }}</p>
     {% endfor %}
 </form>
-
 {% endblock %}

@@ -1,29 +1,85 @@
 import uuid
-from saby_combat import db
-from .models import Users
+from flask_mail import Message
+from datetime import datetime
+from saby_combat import db, app, mail
 from sqlalchemy import text
 from werkzeug.security import generate_password_hash
+from .models import Users
 
 
-def get_user_by_username(username):
+# Отправляет email сообщение со ссылкой для подтверждения аккаунта
+# на электронную почту с адресом 'to'
+def send_confirmation_email(to, subject, html_template) -> None:
+    message = Message(
+        subject=subject,
+        recipients=[to],
+        html=html_template,
+        sender=app.config["MAIL_DEFAULT_SENDER"]
+    )
+    mail.send(message)
+    return
+
+
+# Возвращает 'True', если пользователь подтвержден,
+# иначе - 'False'
+def is_user_confirmed(user) -> bool:
+    is_confirmed = db.session.execute(
+        text(
+            """
+            SELECT email_verified
+            FROM user_verification
+            WHERE user_id=:user_id 
+            """
+        ).params(user_id=user.id)
+    ).scalar()
+    if is_confirmed != None:
+        return is_confirmed
+    else:
+        raise Exception(f"Пользователь c id = {user.id} не найден")
+
+
+# Задает значения, соответствующие подтвержденному пользователю
+# в таблице 'user_verification' 
+def confirm_user_email(user) -> None:
+    query_status = db.session.execute(
+        text(
+            """
+            UPDATE user_verification
+            SET email_verified=:verified, verified_on=:timestamp
+            WHERE user_id=:user_id
+            RETURNING user_id
+            """
+        ).params(
+            verified=True,
+            timestamp=datetime.now(),
+            user_id=user.id
+        )
+    ).scalar()
+    if query_status != None:
+        db.session.commit()
+        return
+    else:
+        raise Exception(f"Пользователь c id = {user.id} не найден")
+    
+
+def get_user_by_username(username) -> Users:
     user = db.session.query(Users).from_statement(
         text("SELECT * FROM users where username=:uname").params(uname=username)
     ).first()
     return user
 
 
-def get_user_by_email(email_adress):
-    user = db.session.execute(
+def get_user_by_email(email_adress) -> Users:
+    user = db.session.query(Users).from_statement(
         text("SELECT * FROM users where email=:email").params(email=email_adress)
     ).first()
     return user
 
 
-# Не знаю с чем связана проблема
-# При текстовых sql запросах в Not Null полях не выставляются 
-# дефолтные значения, может они не были заданы при написании
-# скрипта создания таблиц или с моей стороны что-то...
-def add_new_user(form):
+# Создает запись о новом пользователе по данным
+# из 'form' во всех связанных с пользователем таблицах
+# ('users', 'user_verification', 'user_coins', 'user_info').
+def add_new_user(form) -> Users:
     # Инсерт нового пользователя в бд
     insert_user_query = text(
         """
@@ -84,5 +140,4 @@ def add_new_user(form):
     )
     db.session.execute(insert_user_info_query)
     db.session.commit()
-
     return user

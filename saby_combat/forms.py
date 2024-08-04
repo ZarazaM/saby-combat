@@ -33,14 +33,13 @@ class Password(object):
             raise ValidationError(self.message)
             
 
-# какую можно поставить максимальную длину первичного пароля? или так и оставить?
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
     email_adress = EmailField('Email', validators=[DataRequired(), Email(check_deliverability=True)])
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=30)])
     surname = StringField('Surname', validators=[DataRequired(), Length(min=2, max=30)])
     patronymic = StringField('Patronymic', validators=[Optional(), Length(min=2, max=30)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6), Password()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6), Password(50)])
     password_submit = PasswordField('Password_submit', validators=[EqualTo('password')])
     submit = SubmitField()
 
