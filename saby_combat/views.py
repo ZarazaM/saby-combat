@@ -1,14 +1,21 @@
 from saby_combat import app, db
-from flask import render_template, request, redirect, url_for, flash, make_response, session
+from flask import render_template, request, redirect, url_for, flash, make_response, session, jsonify
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm
+from .utils import get_user_coins, submit_clicks_to_db
 
-
-@app.route('/')
+@app.route('/', methods=['GET'])
+# @login_required
 def click_page():
-    return render_template('click_page.html')
+    user_current_coins = get_user_coins()
+    return render_template('click_page.html', money=user_current_coins)
 
+@app.route('/submit_clicks', methods=['POST'])
+# @login_required
+def submit_clicks():
+    data = request.json
+    return submit_clicks_to_db(data)
 
 @app.route('/rating')
 def rating_page():
@@ -43,13 +50,13 @@ def admin_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if current_user.is_authenticated:
-        return redirect(url_for('admin_page'))
+        return redirect(url_for('click_page'))
     form = LoginForm()
     if form.validate_on_submit():
         user = db.session.query(Users).filter(Users.username == form.username.data).first()
-        if user and user.check_password(form.password.data):
+        if user and user.password_hash == form.password.data:
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('admin_page'))
+            return redirect(url_for('click_page'))
         flash('invalid username/password', 'error')
         return redirect(url_for('login_page'))
     return render_template('login.html', form=form)

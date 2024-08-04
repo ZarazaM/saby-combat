@@ -1,15 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<script type="text/javascript">
-    var clicks = 0;
-    function onClick() {
-        clicks += 1;
-        document.getElementById("clicks").innerHTML = clicks;
-    };
-</script>
-<button type="button" onClick="onClick()">click here to gain money</button>
-<p>Clicks: <a id="clicks">0</a></p>
-
+<button type="button" id="click-button">Click here to gain money</button>
+<p>Монеты: </p><p><span id="money-count">{{ money }}</span></p>
 {% endblock %}
