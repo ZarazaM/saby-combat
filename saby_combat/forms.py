@@ -1,10 +1,9 @@
 import string
 from saby_combat import db
 from flask_wtf import FlaskForm
-from wtforms import Form, ValidationError
-from wtforms.fields import StringField, SubmitField, TextAreaField, BooleanField, EmailField, PasswordField
+from wtforms import ValidationError
+from wtforms.fields import StringField, SubmitField, BooleanField, EmailField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
-from .models import Users
 from .utils import get_user_by_username, get_user_by_email
 
 
@@ -18,18 +17,19 @@ class Password(object):
         self.message = None
 
     def __call__(self, form, field):
-        self.message = ""
+        self.message = []
         if self.uppercase and not any(map(lambda x: x.isupper(), field.data)):
-            self.message += ", символы верхнего регистра 'A-Z'"
+            self.message.append("символы верхнего регистра 'A-Z'")
         if self.lowercase and not any(map(lambda x: x.islower(), field.data)):
-            self.message += ", символы нижнего регистра 'a-z'"
+            self.message.append("символы нижнего регистра 'a-z'")
         if self.numbers and not any(map(lambda x: x.isdigit(), field.data)):
-            self.message += ", цифры '0-9'"
+            self.message.append("цифры '0-9'")
         if self.special_characters and not any([1 if x in string.punctuation else 0 for x in field.data]):
-            self.message += ", специальные символы"
+            self.message.append("специальные символы")
 
-        if self.message:
-            self.message = "Пароль должен содержать " + self.message.replace(",", "", 1) + "."
+        if self.message.__len__():
+            print(self.message.__len__())
+            self.message = f"Пароль должен содержать {", ".join(self.message)}."
             raise ValidationError(self.message)
             
 

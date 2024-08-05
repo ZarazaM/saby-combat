@@ -7,9 +7,10 @@ from werkzeug.security import generate_password_hash
 from .models import Users
 
 
+
 # Отправляет email сообщение со ссылкой для подтверждения аккаунта
 # на электронную почту с адресом 'to'
-def send_confirmation_email(to, subject, html_template) -> None:
+def send_confirmation_email(to: str, subject: str, html_template: str) -> None:
     message = Message(
         subject=subject,
         recipients=[to],
@@ -22,7 +23,7 @@ def send_confirmation_email(to, subject, html_template) -> None:
 
 # Возвращает 'True', если пользователь подтвержден,
 # иначе - 'False'
-def is_user_confirmed(user) -> bool:
+def is_user_confirmed(user: Users) -> bool:
     is_confirmed = db.session.execute(
         text(
             """
@@ -40,7 +41,7 @@ def is_user_confirmed(user) -> bool:
 
 # Задает значения, соответствующие подтвержденному пользователю
 # в таблице 'user_verification' 
-def confirm_user_email(user) -> None:
+def confirm_user_email(user: Users) -> None:
     query_status = db.session.execute(
         text(
             """
@@ -62,14 +63,14 @@ def confirm_user_email(user) -> None:
         raise Exception(f"Пользователь c id = {user.id} не найден")
     
 
-def get_user_by_username(username) -> Users:
+def get_user_by_username(username: Users) -> Users:
     user = db.session.query(Users).from_statement(
         text("SELECT * FROM users where username=:uname").params(uname=username)
     ).first()
     return user
 
 
-def get_user_by_email(email_adress) -> Users:
+def get_user_by_email(email_adress: str) -> Users:
     user = db.session.query(Users).from_statement(
         text("SELECT * FROM users where email=:email").params(email=email_adress)
     ).first()

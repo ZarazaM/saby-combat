@@ -15,5 +15,5 @@ def confirm_verification_token(verification_token, expiration=6000) -> str:
     try:
         email_adress = serializer.loads(verification_token, salt=app.config["SECURITY_PASSWORD_SALT"], max_age=expiration)
         return email_adress
-    except Exception:
-        return False
+    except Exception as ex:
+        raise ex

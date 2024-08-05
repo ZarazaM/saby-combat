@@ -33,7 +33,6 @@ class Users(db.Model, UserMixin):
         self.password_hash = generate_password_hash(plain_text_password)
 
 
-
 friends = db.Table('friends',
                    db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')),
                    db.Column('friend_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')))
