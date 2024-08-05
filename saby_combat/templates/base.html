@@ -1,35 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
     <meta charset="UTF-8">
     <title>Saby Combat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images-utils/favicon.ico') }}">
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
 </head>
 
 <body>
-
     <header>
-        <nav>
-            <a href="{{ url_for('click_page') }}">main</a>
-            <a href="{{ url_for('profile_page') }}">profile</a>
-            <a href="{{ url_for('upgrade_page') }}">upgrades</a>
-            <select>
-                <option value="#">рейтинг</option>
-                <option value="{{ url_for('rating_page') }}">индивидуальный рейтинг</option>
-                <option value="{{ url_for('rating_page') }}">клановый рейтинг</option>
-            </select>
-            <a href="{{ url_for('friends_page') }}">friends</a>
-            <a href="{{ url_for('login_page') }}">login</a>
-<!--            {% if false %}-->
-<!--                <a href="{{ url_for('profile_page') }}">profile</a>-->
-<!--            {% else %}-->
-<!--                <a href="{{ url_for('login_page') }}">auth</a>-->
-<!--            {% endif %}-->
-            <a href="{{ url_for('register_page') }}">register</a>
-            <a href="{{ url_for('admin_page') }}">admin(пока без всего)</a>
-            <a href="{{ url_for('logout') }}">logout</a>
+        <nav class="container">
+            <div class="logo-sidebar">
+                <h2><span>Saby</span>Combat</h2>
+            </div>
+            <div class="menu">
+                <p class="description-menu">Страницы</p>
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('click_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_main.svg') }}" alt="Изображение главной вкладки">
+                        </div>
+                        <h4 class="text-menu-element">Главная</h4>
+                    </a>
+                </div>
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('upgrade_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_store.svg') }}" alt="Изображение вкладки магазина">
+                        </div>
+                        <h4 class="text-menu-element">Магазин</h4>
+                    </a>
+                </div>
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('profile_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_profile.svg') }}" alt="Изображение вкладки профиля">
+                        </div>
+                        <h4 class="text-menu-element">Профиль</h4>
+                    </a>
+                </div>
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('friends_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_comminuty.svg') }}" alt="Изображение вкладки сообщество">
+                        </div>
+                        <h4 class="text-menu-element">Сообщество</h4>
+                    </a>
+                </div>
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('rating_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_rating.svg') }}" alt="Изображение вкладки рейтинга">
+                        </div>
+                        <h4 class="text-menu-element">Рейтинг</h4>
+                    </a>
+                </div>
+                <hr>
+                {%if current_user.role == True%}
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('admin_page') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_admin.svg') }}" alt="Изображение вкладки администратора">
+                        </div>
+                        <h4 class="text-menu-element">Админ</h4>
+                    </a>
+                </div>
+                {%endif%}
+                <div class="container-for-element-menu">
+                    <div class="side-decoration"></div>
+                    <a class="block" href="{{ url_for('logout') }}">
+                        <div class="block-for-img">
+                            <img src="{{ url_for('static', filename='images-utils/images-sidebar/sidebar_logout.svg') }}" alt="Изображение вкладки выхода">
+                        </div>
+                        <h4 class="text-menu-element">Выход</h4>
+                    </a>
+                </div>
+            </div>
         </nav>
-        <br>
     </header>
 
     <main>
