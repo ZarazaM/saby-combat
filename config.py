@@ -5,8 +5,8 @@ app_dir = os.path.abspath(os.path.dirname(__file__))
 default_database_uri = 'postgresql://saby_combat_dev:123poi098@localhost:5432/saby_combat'
 default_security_password_salt = 'nikto-nikogda-ne-uznaet'
 default_mail_server = 'smtp.gmail.com'
-default_mail_username = 'foxrad20@gmail.com'
-default_mail_password = 'xeej vcag wzym jtyt'
+default_mail_username = 'youremail@gmail.com'
+default_mail_password = 'some-app-password'
 
 
 class BaseConfig:
