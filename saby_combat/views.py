@@ -1,19 +1,24 @@
 from saby_combat import app, db
-from flask import render_template, request, redirect, url_for, flash, make_response, session
+from flask import render_template, request, redirect, url_for, flash, make_response, session, jsonify
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm, RegisterForm
-from .utils import add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, confirm_user_email, send_confirmation_email
+from .utils import add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db
 from .verification_token import generate_verification_token, confirm_verification_token
 from .decorators import logout_required, confirm_your_email, admin_required
 
-
-@app.route('/')
+@app.route('/', methods=['GET'])
 @login_required
 @confirm_your_email
 def click_page():
-    return render_template('click_page.html')
+    user_current_coins = get_user_coins()
+    return render_template('click_page.html', money=user_current_coins)
 
+@app.route('/submit_clicks', methods=['POST'])
+@login_required
+def submit_clicks():
+    data = request.json
+    return submit_clicks_to_db(data)
 
 @app.route('/rating')
 @login_required
@@ -48,7 +53,7 @@ def confirm_email(verification_token):
         if is_user_confirmed(current_user):
             flash("Ваш аккаунт уже подтвержден.")
             return redirect(url_for('click_page'))
-        
+
         # Аккаунт еще не был подтвержден -> проверка по токену
         email_adress = confirm_verification_token(verification_token)
         user = get_user_by_email(email_adress)
@@ -63,7 +68,7 @@ def confirm_email(verification_token):
         return redirect(url_for('click_page'))
     except Exception as ex:
         flash(ex.__str__())
-        # Надо добавить html страницу "Пользователь не найден", пока что 
+        # Надо добавить html страницу "Пользователь не найден", пока что
         # будет перекидывать на страницу входа
         return redirect(url_for('login_page'))
 

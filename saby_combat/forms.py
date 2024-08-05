@@ -29,7 +29,7 @@ class Password(object):
 
         if self.message.__len__():
             print(self.message.__len__())
-            self.message = f"Пароль должен содержать {", ".join(self.message)}."
+            self.message = f'Пароль должен содержать {", ".join(self.message)}.'
             raise ValidationError(self.message)
             
 

@@ -71,7 +71,7 @@ class Levels(db.Model):
 
 class UserCoins(db.Model):
     __tablename__ = 'user_coins'
-    user_id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'), primary_key=True)
     total_coins = db.Column(db.BigInteger(), default=0)
     current_coins = db.Column(db.BigInteger(), default=0)
     click_count = db.Column(db.Integer(), default=0)
