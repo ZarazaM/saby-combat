@@ -18,12 +18,19 @@ class Users(db.Model, UserMixin):
     blocked = db.Column(db.Boolean(), default=False)
     clan_id = db.Column(db.Integer())
     referral_link = db.Column(db.String(40), nullable=False)
+    
+    def compare_password(self, plain_text_password):
+        return check_password_hash(self.password_hash, plain_text_password)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    # Получается, что эти свойства вообще не нужны, 
+    # если делать все через текстовые запросы?
+    @property
+    def password(self):
+        return self.password
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    @password.setter
+    def password(self, plain_text_password):
+        self.password_hash = generate_password_hash(plain_text_password)
 
 
 friends = db.Table('friends',
