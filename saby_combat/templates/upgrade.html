@@ -18,7 +18,7 @@
             success: function(response){
                 response.data.forEach(upgrade => {
                     const upgradeElement = `
-                        <div class="upgrade">
+                        <div class="upgrade" id="upgrade_id_${upgrade.id}">
                             <h2>${upgrade.upgrade_name}</h2>
                             <p>Цена: ${upgrade.purchase_cost}</p>
                             <button onclick="buyUpgrade(${userId}, ${upgrade.id})">Купить</button>
@@ -43,6 +43,20 @@
                     type: 'post',
                     success: function(response) {
                         console.log(response);
+                        $.ajax({
+                        url: '/api/user_upgrades',
+                        type: 'get',
+                        data: {
+                            user_id: userId,
+                            upgrade_id: upgradeId
+                        },
+                        success: function(response){
+                            response.data.for
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            console.error('Получена ошибка: ' + textStatus, errorThrown);
+                        }
+                        });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error('Ошибка: ' + textStatus, errorThrown);
