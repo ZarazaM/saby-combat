@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -12,4 +11,6 @@
     {% endwith %}
 <button type="button" id="click-button">Click here to gain money</button>
 <p>Монеты: </p><p><span id="money-count">{{ money }}</span></p>
+<p>Прибыль за клик: </p><p><span id="coins_per_click">{{ coins_per_click }}</span></p>
+<p>Пассивный доход: </p><p><span id="coins_per_second">{{ coins_per_second }}</span></p>
 {% endblock %}

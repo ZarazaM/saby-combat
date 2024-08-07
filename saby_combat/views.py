@@ -3,16 +3,21 @@ from flask import render_template, request, redirect, url_for, flash, make_respo
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm, RegisterForm
-from .utils import add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db
+from .utils import add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, confirm_user_email, send_confirmation_email, get_data_for_main_page, submit_clicks_to_db
 from .verification_token import generate_verification_token, confirm_verification_token
 from .decorators import logout_required, confirm_your_email, admin_required
 
 @app.route('/', methods=['GET'])
 @login_required
-@confirm_your_email
+# @confirm_your_email
 def click_page():
-    user_current_coins = get_user_coins()
-    return render_template('click_page.html', money=user_current_coins)
+    user_data = get_data_for_main_page()
+    return render_template(
+        'click_page.html',
+        money=user_data['current_coins'],
+        coins_per_click=user_data['coins_per_click'],
+        coins_per_second=user_data['coins_per_second']
+    )
 
 @app.route('/submit_clicks', methods=['POST'])
 @login_required
@@ -119,6 +124,3 @@ def logout():
 @login_required
 def profile_page():
     return render_template('profile.html')
-
-
-
