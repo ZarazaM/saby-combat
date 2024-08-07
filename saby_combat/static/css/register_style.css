@@ -1,32 +1,41 @@
+* {
+    box-sizing: border-box;
+}
 html{
-    max-height: 100%;
+    height: 100vh;
 }
 body{
+    min-height: 100vh;
     margin: 0;
-    max-height: 100%;
-    min-height: 100%;
     display: flex;
+    flex-grow: 1;
     align-items: center;
     justify-content: center;
     background-color:  #4880FF;
+    background-image: url("../images-utils/background.svg");
+    background-attachment: fixed;
+    background-position: center 25%;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 @font-face {
     font-family: 'NunitoSansCondensedSemiBold';
-    src: url('fonts/NunitoSans_7pt_Condensed-SemiBold.ttf') format('truetype');
+    src: url('../fonts/NunitoSans_7pt_Condensed-SemiBold.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'NunitoSansCondensedBold';
-    src: url('fonts/NunitoSans_7pt_Condensed-Bold.ttf') format('truetype');
+    src: url('../fonts/NunitoSans_7pt_Condensed-Bold.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'NunitoSansCondensedExtraBold';
-    src: url('fonts/NunitoSans_7pt_Condensed-ExtraBold.ttf') format('truetype');
+    src: url('../fonts/NunitoSans_7pt_Condensed-ExtraBold.ttf') format('truetype');
 }
 .form-container{
     display: flex;
     min-width: 35%;
+    width: 40vw;
     min-height: 70%;
     margin-top: 20pt;
     margin-bottom: 20pt;
@@ -35,7 +44,7 @@ body{
     align-items: center;
     justify-content: center;
     background-color: rgb(255, 255, 255);
-    border-radius: 10px;
+    border-radius: 24px;
 }
 .form-container-element-field{
     display: flex;
@@ -62,8 +71,12 @@ body{
     padding-left: 5px;
     background-color: #f8f8f8;
     border: 1px solid rgb(203, 197, 217);
-    border-radius: 10px;
+    border-radius: 8px;
     box-sizing: border-box;
+    color: #656565;
+    font-family: 'NunitoSansCondensedSemiBold', sans-serif;
+    font-size: 12pt;
+    padding: 0 15px;
 }
 .form-container-element-field h2{
     display: flex;
@@ -112,11 +125,12 @@ body{
     font-family: 'NunitoSansCondensedExtraBold', sans-serif;
     font-size: 24pt;
     color: #202224;
+    letter-spacing: -0.11px;
 }
 .form-container-element-title p{
     margin: 0 0 0 0;
     font-family: 'NunitoSansCondensedBold', sans-serif;
-    font-size: 14pt;
+    font-size: 12pt;
     color:#656565;
 }
 
@@ -141,9 +155,14 @@ body{
     background-color: #4880FF;
     color: #ffffff;
     border: #4880FF;
-    border-radius: 10px;
+    border-radius: 8px;
+    cursor:pointer;
+    transition: 0.3s;
 }
+.form-container-element-submit input:hover{
+    background-color: #3D72EC;
 
+}
 
 .form-container-element-login{
     display: flex;
@@ -160,7 +179,48 @@ body{
 }
 .form-container-element-login a{
     margin: 0 0 0 0;
-    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-family: 'NunitoSansCondensedExtraBold', sans-serif;
     font-size: 10pt;
     color:#4880FF;
+}
+
+@media (max-width: 1150px){
+    body .form-container{
+        flex-grow: 0;
+        width: 85vw;
+        height: fit-content;
+        padding: 8%;
+    }
+    .form-container-element-logo h2{
+        font-size: 60px;
+    }
+    .form-container-element-title h2{
+        font-size: 40px;
+    }
+    .form-container-element-field input, .form-container-element-login a, .form-container-element-login p, .form-container-element-title p, .form-container-element-field label, .form-container-element-field label p, .form-container-element-checkbox label {
+        font-size: 30px;
+    }
+    .form-container-element-checkbox input{
+        width: 40px;
+        height: 40px;
+    }
+    .form-container-element-checkbox label{
+        margin-left: 15px;
+    }
+    .form-container-element-field input{
+        flex-grow: 0;
+        height: calc(50px + 2vh);
+    }
+    .form-container-element-field label{
+        flex-grow: 0.1;
+    }
+    .form-container-element-submit{
+        height: calc(50px + 2vh);
+    }
+    .form-container-element-submit input{
+        font-size: 30px;
+    }
+    .form-container-element-field{
+        flex-grow: 0.3;
+    }
 }

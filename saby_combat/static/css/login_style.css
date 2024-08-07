@@ -8,11 +8,12 @@ body{
     display: flex;
     flex-grow: 1;
     min-height: 100vh;
-    margin: 0 0 0 0;
+    margin: 0;
     align-items: center;
     justify-content: center;
     background-color:  #4880FF;
     background-image: url("../images-utils/background.svg");
+    background-attachment: fixed;
     background-position: center 25%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -33,7 +34,7 @@ body{
 }
 body .form-container{
     display: flex;
-    flex-grow: 0.01;
+    width: 40vw;
     min-width: 35%;
     min-height: 90%;
     margin-top: 20pt;
@@ -76,6 +77,9 @@ body .form-container{
     border: 1px solid rgb(203, 197, 217);
     border-radius: 8px;
     box-sizing: border-box;
+    color: #656565;
+    font-family: 'NunitoSansCondensedSemiBold', sans-serif;
+    font-size: 12pt;
     padding: 0 15px;
 }
 .form-container-element-field h2{
@@ -97,6 +101,7 @@ body .form-container{
 }
 .form-container-element-field label p:hover{
     text-decoration: underline;
+
 }
 
 
@@ -110,7 +115,7 @@ body .form-container{
 .form-container-element-logo h2{
     margin: 0 0 0 0;
     font-family: 'NunitoSansCondensedExtraBold', sans-serif;
-    font-size: 24;
+    font-size: 24px;
     color: #202224;
 }
 .form-container-element-logo span{
@@ -157,6 +162,7 @@ body .form-container{
     border: 1px solid rgb(76, 0, 255);
     box-sizing: border-box;
     margin: 0 0 0 0;
+    cursor: pointer;
 }
 .form-container-element-checkbox label{
     display: flex;
@@ -190,9 +196,13 @@ body .form-container{
     color: #ffffff;
     border: #4880FF;
     border-radius: 8px;
+    cursor:pointer;
+    transition: 0.3s;
 }
+.form-container-element-submit input:hover{
+    background-color: #3D72EC;
 
-
+}
 .form-container-element-login{
     display: flex;
     width: 100%;
@@ -202,6 +212,7 @@ body .form-container{
 }
 .form-container-element-login p{
     margin: 0 0 0 0;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
     font-family: 'NunitoSansCondensedBold', sans-serif;
     font-size: 10pt;
     color:#656565;
