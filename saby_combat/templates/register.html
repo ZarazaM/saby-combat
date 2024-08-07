@@ -1,20 +1,59 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<form action="" method="post">
-    {{ form.csrf_token() }}
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-    {% for field in form if field.name != "csrf_token" %}
-    <p>{{ field.label() }}</p>
-    <p>{{ field }}</p>
-    {% endfor %}
-</form>
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>Saby Combat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register_style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images-utils/favicon.ico') }}">
+</head>
+
+<body>
+    <form action="" method="post" class="form-container">
+        <div class="form-container-element-logo">
+            <h2><span>Saby</span>Combat</h2>
+        </div>
+        <div class="form-container-element-title">
+            <h2>Регистрация</h2>
+        </div>
+        <div class="form-container-element-title">
+            <p>Создайте аккаунт, чтобы продолжить</p>
+        </div>
+        <div class="form-container-element-field">
+            <label>Электронная почта</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="form-container-element-field">
+            <label>Логин</label>
+            <input type="text" name="login" id="login">
+        </div>
+        <div class="form-container-element-field">
+            <label>Фамилия</label>
+            <input type="text" name="surname" id="surname">
+        </div>
+        <div class="form-container-element-field">
+            <label>Имя</label>
+            <input type="text" name="name" id="name">
+        </div>
+        <div class="form-container-element-field">
+            <label>Отчество</label>
+            <input type="text" name="patronymic" id="patronymic">
+        </div>
+        <div class="form-container-element-field">
+            <label>Пароль</label>
+            <input type="password" name="password1" id="password1">
+        </div>
+        <div class="form-container-element-field">
+            <label>Подтвердите пароль</label>
+            <input type="password" name="password2" id="password2">
+        </div>
+        <div class="form-container-element-submit">
+            <input type="submit" value="Зарегистрироваться">
+        </div>
+        <div class="form-container-element-login">
+            <p>Уже есть аккаунт? <a href="{{url_for('login_page')}}"> Войти</a></p>
+        </div>
+    </form>
+</body>
+
+</html>

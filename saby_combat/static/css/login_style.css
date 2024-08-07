@@ -1,0 +1,204 @@
+* {
+    box-sizing: border-box;
+}
+html{
+    height: 100%;
+}
+body{
+    display: flex;
+    flex-grow: 1;
+    min-height: 100vh;
+    margin: 0 0 0 0;
+    align-items: center;
+    justify-content: center;
+    background-color:  #4880FF;
+}
+@font-face {
+    font-family: 'NunitoSansCondensedSemiBold';
+    src: url('fonts/NunitoSans_7pt_Condensed-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'NunitoSansCondensedBold';
+    src: url('fonts/NunitoSans_7pt_Condensed-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'NunitoSansCondensedExtraBold';
+    src: url('fonts/NunitoSans_7pt_Condensed-ExtraBold.ttf') format('truetype');
+}
+body .form-container{
+    display: flex;
+    flex-grow: 0.01;
+    min-width: 35%;
+    min-height: 90%;
+    margin-top: 20pt;
+    margin-bottom: 20pt;
+    padding: 3%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+}
+.form-container-element-field{
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    margin: 30px 10px 10px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.form-container-element-field label{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 100%;
+    margin-top:2px;
+    margin-bottom: 2px;
+    flex-grow: 1;
+    color: #656565;
+    font-family: 'NunitoSansCondensedSemiBold', sans-serif;
+    font-size: 12pt;
+    flex-shrink: 1;
+}
+.form-container-element-field input{
+    width: 100%;
+    height: 40px;
+    flex-grow: 1;
+    padding-left: 5px;
+    background-color: #f8f8f8;
+    border: 1px solid rgb(203, 197, 217);
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+.form-container-element-field h2{
+    display: flex;
+    width: 100%;
+    margin: 0px 0px 10px 0px;
+    color:#000000;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 20pt;
+}
+.form-container-element-field label p{
+    display: flex;
+    align-items: right;
+    margin: 0px 0px 0px 0px;
+    color: #868686;
+    font-family: 'NunitoSansCondensedSemiBold', sans-serif;
+    font-size: 10pt;
+}
+
+
+.form-container-element-logo{
+    display: flex;
+    width:100%;
+    margin-bottom: 10px;
+    justify-content: center;
+    align-items: center;
+}
+.form-container-element-logo h2{
+    margin: 0 0 0 0;
+    font-family: 'NunitoSansCondensedExtraBold', sans-serif;
+    font-size: 24;
+    color: #202224;
+}
+.form-container-element-logo span{
+        color: #4880FF;
+}
+
+
+.form-container-element-title{
+    display: flex;
+    width: 100%;
+    margin: 10px 0 10px 0;
+    justify-content: center;
+    align-items: center;
+}
+.form-container-element-title h2{
+    margin: 0 0 0 0;
+    font-family: 'NunitoSansCondensedExtraBold', sans-serif;
+    font-size: 24pt;
+    color: #202224;
+}
+.form-container-element-title p{
+    margin: 0 0 0 0;
+    text-align: center;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 12pt;
+    color:#656565;
+}
+
+
+.form-container-element-checkbox{
+    display: flex;
+    width: 100%;
+    margin: 10px 0 10px 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.form-container-element-checkbox input{
+    display: flex;
+    width: 15pt;
+    height: 15pt;
+    background-color: #f8f8f8;
+    border: 1px solid rgb(76, 0, 255);
+    box-sizing: border-box;
+    margin: 0 0 0 0;
+}
+.form-container-element-checkbox label{
+    display: flex;
+    width:100%;
+    margin-left: 6px;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 10pt;
+    color:#656565;
+}
+
+
+.form-container-element-submit{
+    width: 75%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form-container-element-submit label{
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 14pt;
+    color:#ffffff;
+}
+.form-container-element-submit input{
+    width: 100%;
+    height: 100%;
+    margin: 30px 0 10px 0;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 14pt;
+    background-color: #4880FF;
+    color: #ffffff;
+    border: #4880FF;
+    border-radius: 10px;
+}
+
+
+.form-container-element-login{
+    display: flex;
+    width: 100%;
+    margin: 20px 0 0 0;
+    justify-content: center;
+    align-items: center;
+}
+.form-container-element-login p{
+    margin: 0 0 0 0;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 10pt;
+    color:#656565;
+}
+.form-container-element-login a{
+    margin: 0 0 0 0;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 10pt;
+    color:#4880FF;
+}
