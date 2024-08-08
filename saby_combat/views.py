@@ -1,13 +1,14 @@
-from saby_combat import app, db
+from saby_combat import app, db, cache
 from flask import render_template, request, redirect, url_for, flash, make_response, session, jsonify
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm, RegisterForm
-from .utils import (add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, 
+from .utils import (add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed,
                     confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db, 
-                    send_referral_prize, add_friend_by_uuid, is_existing_uuid)
+                    send_referral_prize, add_friend_by_uuid, is_existing_uuid, show_ratings)
 from .verification_token import generate_verification_token, confirm_verification_token
 from .decorators import logout_required, confirm_your_email, admin_required
+
 
 @app.route('/', methods=['GET'])
 @login_required
@@ -24,9 +25,15 @@ def submit_clicks():
 
 @app.route('/rating')
 @login_required
+@cache.cached(timeout=60*10)
 def rating_page():
-    return render_template('rating.html')
-
+    result_1, result_2, result_3, result_4 = show_ratings()
+    return (render_template
+            ('rating.html',
+             user_all_coins=result_1,
+             user_all_clicks=result_2,
+             clan_all_coins=result_3,
+             clan_all_clicks=result_4))
 
 @app.route('/upgrade')
 @login_required
@@ -107,6 +114,7 @@ def register_page():
         confirm_url = url_for('confirm_email', verification_token=token, _external=True)
         html_template = render_template('confirm_email.html', confirm_url=confirm_url)
         subject = "Пожалуйста, подтвердите регистрацию аккаунта Saby Combat"
+
         # Закомментил, чтобы останых не смущала ошибка почты
         #send_confirmation_email(user.email, subject, html_template)
         return redirect(url_for('login_page'))
