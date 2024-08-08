@@ -3,7 +3,9 @@ from flask import render_template, request, redirect, url_for, flash, make_respo
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm, RegisterForm
-from .utils import add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db
+from .utils import (add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, 
+                    confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db, 
+                    send_referral_prize, add_friend_by_uuid, is_existing_uuid)
 from .verification_token import generate_verification_token, confirm_verification_token
 from .decorators import logout_required, confirm_your_email, admin_required
 
@@ -92,8 +94,15 @@ def login_page():
 @logout_required
 def register_page():
     form = RegisterForm()
+    referrer_uuid = request.args.get("ref")
     if form.validate_on_submit():
-        user = add_new_user(form)
+        if referrer_uuid and is_existing_uuid(referrer_uuid):
+            user = add_new_user(form)
+            send_referral_prize(referrer_uuid=referrer_uuid)
+            add_friend_by_uuid(user, referrer_uuid)
+        else:
+            user = add_new_user(form)
+        # Оптравка сообщения с подтверждением на почту
         token = generate_verification_token(user.email)
         confirm_url = url_for('confirm_email', verification_token=token, _external=True)
         html_template = render_template('confirm_email.html', confirm_url=confirm_url)
