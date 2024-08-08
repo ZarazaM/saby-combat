@@ -7,20 +7,50 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #eaf7ea; /* Очень бледно зелёный фон */
+            background-color: #eeeeee; /* Очень бледно зелёный фон */
         }
-        .section, .clans {
-            height: 250px; /* Высота области прокрутки */
-            overflow-y: auto; /* Вертикальная прокрутка */
-            scroll-snap-type: y; /* Поддержка snap-прокрутки */
-            border: 1px solid #ccc; /* Граница для визуального разделения */
-            padding: 10px; /* Отступы внутри секции */
+        .container_invitations {
+            max-width: 90%; /* Максимальная ширина контейнера */
+            margin: 0 auto; /* Центрируем контейнер по горизонтали */
+            padding: 20px; /* Внутренние отступы вокруг содержимого */
+            background-color: #f9f9f9; /* Светлый фон для контейнера */
+            border: 1px solid #ddd; /* Серая рамка вокруг контейнера */
+            border-radius: 8px; /* Скругление углов контейнера */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для создания глубины */
+        }
+        .container {
+            margin-bottom: 2cm; /* Отступ между div */
+            padding: 2cm; /* Внутренние отступы */
+            background-color: #e6f9e6; /* Светло-зеленый фон */
+            border-radius: 12px; /* Скругление углов */
+            padding: 20px; /* Внутренние отступы */
+            display: flex; /* Используем flexbox для выравнивания элементов */
+            align-items: center; /* Центрируем элементы по вертикали */
+            justify-content: space-between; /* Располагаем элементы по краям */
+            max-width: 90%; /* Максимальная ширина контейнера (90% от ширины окна) */
+            margin: auto; /* Центрируем контейнер на странице */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта подъема */
+        }
+        .section {
+            margin-bottom: 20px; /* Отступ между div */
+            padding: 20px; /* Отступы внутри секции */
             background-color: #f9f9f9; /* Цвет фона секции */
+            border-radius: 8px; /* Скругление углов секции */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Небольшая тень для создания эффекта подъема */
+            max-width: 90%; /* Максимальная ширина секции (90% от ширины окна) */
+            margin: auto; /* Центрирование секции на странице */
+            padding-left: 30px; /* Левый отступ */
+            padding-right: 30px; /* Правый отступ */
         }
+
          /* Стили для кнопки добавления друга */
         .btn-primary {
             background-color: green; /* Зелёный фон кнопки */
             color: white; /* Белый текст кнопки */
+            border: none; /* Убираем рамку */
+            padding: 10px 20px; /* Внутренние отступы кнопки */
+            border-radius: 4px; /* Скругляем углы кнопки */
+            cursor: pointer; /* Курсор при наведении */
             float: right; /* Перемещение кнопки вправо */
         }
         .no-list {
@@ -28,59 +58,247 @@
             padding: 0; /* Убираем внутренние отступы */
             margin: 0; /* Убираем внешние отступы */
         }
+        .table-container::-webkit-scrollbar {
+            display: none; /* Скрываем ползунок для WebKit-браузеров */
+        }
+        .table-container {
+            width: 100%; /* Ширина контейнера 100% */
+            max-height: 250px; /* Максимальная высота для контейнера таблицы */
+            overflow-y: hidden; /* Скрыть вертикальную прокрутку */
+            border: 1px solid #ddd; /* Рамка вокруг контейнера */
+            border-radius: 8px; /* Скругление углов контейнера таблицы */
+            overflow-y: auto; /* Добавление вертикальной прокрутки */
+        }
+        .table-container {
+            -ms-overflow-style: none;  /* Internet Explorer and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        table {
+            width: 100%; /* Ширина таблицы 100% */
+            border-collapse: collapse; /* Убираем разрывы между ячейками */
+        }
+        thead {
+            position: sticky; /* Делаем заголовок "липким" */
+            top: 0; /* Прикрепляем его к верхней части контейнера */
+            background-color: #f2f2f2; /* Цвет фона заголовка */
+            z-index: 1; /* Устанавливаем z-index, чтобы заголовок был выше других элементов */
+        }
+
+        th, td {
+            padding: 10px; /* Отступы в ячейках */
+            text-align: left; /* Выравнивание текста по левому краю */
+            border-bottom: 1px solid #ddd; /* Нижняя граница для ячеек */
+        }
+        tr {
+            display: table; /* Обеспечиваем правильное отображение строк в блочном контексте */
+            width: 100%; /* Устанавливаем ширину на 100% */
+            table-layout: fixed; /* Фиксируем раскладку таблицы */
+        }
+        .button-container {
+            float: right; /* Перемещение кнопки вправо */
+        }
+
+        .button {
+            padding: 10px 15px; /* Внутренние отступы для кнопок */
+            text-decoration: none; /* Убираем подчеркивание */
+            color: white; /* Цвет текста */
+            border-radius: 5px; /* Скругление углов кнопок */
+            float: right; /* Перемещение кнопки вправо */
+        }
+
+        .button.red {
+            background-color: red; /* Красный цвет для отказа */
+        }
+
+        .button.green {
+            background-color: green; /* Зеленый цвет для принятия */
+        }
+
+        .username-link {
+            text-decoration: underline; /* Подчеркивание для ссылки */
+            color: blue; /* Цвет ссылки */
+        }
+        .button_for_clan {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+        .button.create-clan {
+            background-color: green; /* Зеленый цвет для кнопки Создать клан */
+            float: right; /* Перемещение кнопки вправо */
+        }
+        .modal {
+            display: none; /* Скрываем по умолчанию */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px; /* Скругление углов */
+        }
+        .modal-header {
+            color: green; /* Зелёные буквы в заголовке */
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn_for_clan_container {
+            clear: both; /* Очищаем float */
+            margin-top: 20px; /* Отступ сверху */
+        }
+
     </style>
 </head>
 <body>
-<div class="container mt-5">
+<div>
     <h1>Друзья</h1>
     <div class="section">
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th>Фотография профиля</th>
-                <th>Имя пользователя</th>
-                <th>Фамилия</th>
-                <th>Имя</th>
-                <th>Отчество</th>
-                <th>Количество кликов</th>
-                <th>Всего монет</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% if friends['name'] != None %}
-            {% for i in range(friends['name'] | length) %}
-            <tr>
-                <td><img src="{{ friends['profile_picture'][i] }}" alt="Profile Picture"
-                         style="width: 50px; height: 50px;"></td>
-                <td>{{ friends['username'][i] }}</td>
-                <td>{{ friends['surname'][i] }}</td>
-                <td>{{ friends['name'][i] }}</td>
-                <td>{{ friends['patronymic'][i] }}</td>
-                <td>{{ friends['click_count'][i] }}</td>
-                <td>{{ friends['total_coins'][i] }}</td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="7" style="font-size: 24px; font-weight: bold; text-align: center;">У вас нет друзей :(</td>
-            </tr>
-            {% endif %}
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Фото</th>
+                    <th>Ник</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Количество кликов</th>
+                    <th>Всего монет</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if friends['name'] != None %}
+                {% for i in range(friends['name'] | length) %}
+                <tr>
+                    <td><img src="{{ friends['profile_picture'][i] }}" alt="Profile Picture"
+                             style="width: 50px; height: 50px;"></td>
+                    <td>{{ friends['username'][i] }}</td>
+                    <td>{{ friends['surname'][i] }}</td>
+                    <td>{{ friends['name'][i] }}</td>
+                    <td>{{ friends['patronymic'][i] }}</td>
+                    <td>{{ friends['click_count'][i] }}</td>
+                    <td>{{ friends['total_coins'][i] }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" style="font-size: 24px; font-weight: bold; text-align: center;">У вас нет друзей
+                        :(
+                    </td>
+                </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 
+<div class="container">
     <p>Добавляйте друзей по ссылке. Если ваш друг ещё не зарегистрирован, вам начислится бонус в размере 10 000
         монет.</p>
     <button id="copy-link" class="btn btn-primary mt-4">Копировать ссылку на профиль</button>
     <input type="text" id="profile-link" value="http://localhost:5000/register?ref={{ referral_link }}"
            style="opacity: 0; position: absolute;"> <!-- Ссылка на регистрацию -->
 </div>
-<p></p>
-<div class="container mt-5">
-    <h1>Кланы</h1>
-    <div class="table clans table-bordered table-striped">
-        <div class="clans">
-            <table>
+<h1>Клан</h1>
+<div>
+    {% if invitations != None %}
+    <ul class="no-list">
+        {% for i in range( invitations | length ) %}
+        <div class="container_invitations">
+            <li>
+                <a href="{{ url_for('community', friends=fr_data, referral_link=referral_link,
+                clan_id=clan_id, clan_info=clan_info, members=members, invitations=view_invitations, form=clan_form)}}"
+                   class="username-link">{{ invitations[i][0] }}</a>
+                приглашает вас в клан {{ invitations[i][1] }}
+                <div class="button-container">
+                    <form method="POST" action="">
+                        <input type="hidden" name="do_user" value="accept">
+                        <input type="hidden" name="invitation_id" value="{{ invitations[i][1] }}">
+                        <button type="submit" class="button green">Вступить</button>
+                    </form>
+                </div>
+
+                <div class="button-container">
+                    <form method="POST" action="">
+                        <input type="hidden" name="do_user" value="decline">
+                        <input type="hidden" name="invitation_id" value="{{ invitations[i][1] }}">
+                        <button type="submit" class="button red">Отказаться</button>
+                    </form>
+                </div>
+            </li>
+        </div>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>У вас нет приглашений в клан.</p>
+    {% endif %}
+
+</div>
+
+<div>
+    {% if clan_info == None %}
+    <div class="container">
+        <!-- Кнопка Создать клан -->
+        <button class="button create-clan" id="createClanButton">Создать клан</button>
+
+        <!-- Модальное окно -->
+        <div class="modal" id="clanModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Вы будете являться лидером клана. Добавлять участников клана (до 5 человек) вы можете через профили
+                    друзей.
+                </div>
+                <form method="POST" id="clanForm" action="{{ url_for('community', friends=fr_data, referral_link=referral_link,
+                clan_id=clan_id, clan_info=clan_info, members=members, invitations=view_invitations, form=clan_form) }}">
+                    {{ form.hidden_tag() }} <!-- CSRF-токен -->
+                    <div class="form-group">
+                        <label for="clan_name" style="color: black;">Название клана:</label>
+                        {{ form.clan_name(size=32, id='clan_name', required=True) }}
+                        {% for error in form.clan_name.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="btn-container">
+                        <button type="submit" class="button">Создать</button>
+                        <button type="button" class="button red" id="cancelButton">Отменить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- Скрытая таблица -->
+<div id="clanTableContainer">
+    {% if clan_info != None %}
+    <div class="section">
+        <div class="button-container">
+            <form method="POST" action="">
+                <input type="hidden" name="management" value="delete_clan">
+                <button type="submit" class="button red">Удалить клан</button>
+            </form>
+        </div>
+        <div class="table-container">
+            <table class="table table-bordered table-striped">
                 <thead>
                 <tr>
                     <th>Клан</th>
@@ -98,7 +316,9 @@
                     <td>
                         <ul class="no-list">
                             {% for member in members %}
-                            <li> {{ member }}</li>
+                            <li><a href="{{ url_for('community', friends=fr_data, referral_link=referral_link,
+                clan_id=clan_id, clan_info=clan_info, members=members, invitations=view_invitations, form=clan_form)}}"
+                                   class="username-link">{{ member }}</a></li>
                             {% endfor %}
                         </ul>
                     </td>
@@ -108,7 +328,13 @@
             </table>
         </div>
     </div>
+    {% else %}
+    <p>Нет созданных кланов.</p>
+    {% endif %}
 </div>
+</div>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -121,6 +347,71 @@
         alert("Ссылка скопирована!"); // Уведомление о том, что ссылка скопирована
         link.style.opacity = "0"; // Скрываем элемент снова
     };
+    document.getElementById('create-clan-button').addEventListener('click', function() {
+        var clanName = document.getElementById('clan_name').value;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/clan');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Обновляем страницу
+                document.getElementById('clan-form').style.display = 'none';
+                document.getElementById('clan-table').innerHTML = xhr.responseText;
+            } else {
+                // Обработка ошибок
+                console.error('Ошибка создания клана');
+            }
+        };
+        xhr.send('clan_name=' + clanName);
+    });
+</script>
+<script>
+    const tableContainer = document.getElementById('.table-container');
+
+    // Обработчик события прокрутки
+    tableContainer.addEventListener('wheel', function(e) {
+        e.preventDefault(); // Остановить прокрутку страницы
+        this.scrollTop += e.deltaY; // Прокрутка списка
+    });
+     // Обработчик события касания для мобильных устройств
+    let startY;
+
+    tableContainer.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].clientY; // Запоминаем начальное положение касания
+    });
+
+    tableContainer.addEventListener('touchmove', function(e) {
+        const deltaY = startY - e.touches[0].clientY; // Разница между начальным и текущим положением
+        this.scrollTop += deltaY; // Прокрутка списка
+        startY = e.touches[0].clientY; // Обновляем начальное положение
+        e.preventDefault(); // Предотвращаем стандартное поведение
+    });
+</script>
+<script>
+    // Получаем элементы модального окна и кнопок
+    const clanModal = document.getElementById('clanModal');
+    const createClanButton = document.getElementById('createClanButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const closeButton = document.querySelector('.close'); // Если у вас есть кнопка закрытия
+
+    // Открываем модальное окно при нажатии на кнопку "Создать клан"
+    createClanButton.addEventListener('click', () => {
+        clanModal.style.display = 'block';
+    });
+
+    // Закрываем модальное окно при нажатии на кнопку "Отменить"
+    cancelButton.addEventListener('click', () => {
+        clanModal.style.display = 'none';
+    });
+
+    // Закрываем модальное окно при нажатии вне его
+    window.addEventListener('click', (event) => {
+        if (event.target === clanModal) {
+            clanModal.style.display = 'none';
+        }
+    });
+
+
 </script>
 </body>
 </html>
