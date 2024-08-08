@@ -20,6 +20,8 @@
                     const upgradeElement = `
                         <div class="upgrade" id="upgrade_id_${upgrade.id}">
                             <h2>${upgrade.upgrade_name}</h2>
+                            <p>Сейчас в наличии: ${upgrade.quantity}</p>
+                            <p>Монеты в секунду: ${upgrade.coins_per_second}</p>
                             <p>Цена: ${upgrade.purchase_cost}</p>
                             <button onclick="buyUpgrade(${userId}, ${upgrade.id})">Купить</button>
                         </div>
@@ -51,7 +53,19 @@
                             upgrade_id: upgradeId
                         },
                         success: function(response){
-                            response.data.for
+                            console.log(response.data);
+                            response.data.forEach(upgrade => {
+                                console.log(upgrade);
+                                $(`#upgrade_id_${upgrade.id}`).replaceWith(`
+                                    <div class="upgrade" id="upgrade_id_${upgrade.id}">
+                                    <h2>${upgrade.upgrade_name}</h2>
+                                    <p>Сейчас в наличии: ${upgrade.quantity}</p>
+                                    <p>Монеты в секунду: ${upgrade.coins_per_second}</p>
+                                    <p>Цена: ${upgrade.purchase_cost}</p>
+                                    <button onclick="buyUpgrade(${upgrade.user_id}, ${upgrade.id})">Купить</button>
+                                    </div>
+                                `);
+                            });
                         },
                         error: function(xhr, textStatus, errorThrown) {
                             console.error('Получена ошибка: ' + textStatus, errorThrown);
