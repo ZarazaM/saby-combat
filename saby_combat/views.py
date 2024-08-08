@@ -83,9 +83,8 @@ def login_page():
             login_user(user, remember=form.remember.data)
             return redirect(url_for('click_page'))
         #return redirect(url_for('login_page'))
-    else:
-        for error in form.errors.values():
-            flash('Неверный логин или пароль, попробуйте еще раз.')
+        else:
+            flash('Неверный логин или пароль, попробуйте еще раз.', category="login-fail")
     return render_template('login.html', form=form)
 
 
@@ -99,12 +98,9 @@ def register_page():
         confirm_url = url_for('confirm_email', verification_token=token, _external=True)
         html_template = render_template('confirm_email.html', confirm_url=confirm_url)
         subject = "Пожалуйста, подтвердите регистрацию аккаунта Saby Combat"
-        send_confirmation_email(user.email, subject, html_template)
+        # Закомментил, чтобы останых не смущала ошибка почты
+        #send_confirmation_email(user.email, subject, html_template)
         return redirect(url_for('login_page'))
-    else:
-        # Вывод сообщений изменится, когда будет готов html страницы регистрации
-        for error in form.errors.values():
-            flash(f"Ошибка при регистрации: {error}")
     return render_template('register.html', form=form)
 
 

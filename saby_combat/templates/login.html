@@ -1,3 +1,5 @@
+{% from 'macro.html' import render_logo, render_field, render_submit, render_login_password, render_checkbox %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,30 +12,29 @@
 
 <body>
     <form action="" method="post" class="form-container">
-        <div class="form-container-element-logo">
-            <h2><span>Saby</span>Combat</h2>
-        </div>
+        {{ form.csrf_token }}
+        {{ render_logo() }}
         <div class="form-container-element-title">
             <h2>Войти в аккаунт</h2>
         </div>
         <div class="form-container-element-title">
-            <p>Пожалуйста, введите логин (игровой никнейм) и пароль, чтобы продолжить</p>
+            <h3>Пожалуйста, введите логин (игровой никнейм) и пароль, чтобы продолжить</h3>
         </div>
-        <div class="form-container-element-field">
-            <label>Логин</label>
-            <input type="text" name="login" id="login">
-        </div>
-        <div class="form-container-element-field">
-            <label>Пароль <p>Забыли пароль?</p></label>
-            <input type="password" name="password1" id="password1">
-        </div>
-        <div class="form-container-element-checkbox">
-            <input type="checkbox" id="remember_me">
-            <label for="remember_me">Запомнить пароль</label>
-        </div>
-        <div class="form-container-element-submit">
-            <input type="submit" value="Войти">
-        </div>
+        {{ render_field(form.username) }}
+        {{ render_login_password(form.password) }}
+        {{ render_checkbox(form.remember) }}
+
+        {% with errors = get_flashed_messages(category_filter=["login-fail"]) %}
+        {% if errors %}
+            {% for err in errors %}
+            <div class="form-container-element-title">
+                <p>{{ err }}</p>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {{ render_submit(form.submit) }}
         <div class="form-container-element-login">
             <p>Еще нет аккаунта? <a href="{{url_for('register_page')}}"> Зарегистрироваться</a></p>
         </div>

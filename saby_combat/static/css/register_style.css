@@ -89,9 +89,9 @@ body{
 .form-container-element-field p{
     display: flex;
     margin: 0px 0px 0px 0px;
-    color: #656565;
+    color: #ca1b1b;
     font-family: 'NunitoSansCondensedSemiBold', sans-serif;
-    font-size: 14pt;
+    font-size: 14px;
 }
 
 

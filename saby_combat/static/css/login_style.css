@@ -90,6 +90,13 @@ body .form-container{
     font-family: 'NunitoSansCondensedBold', sans-serif;
     font-size: 20pt;
 }
+.form-container-element-field p{
+    display: flex;
+    margin: 0px 0px 0px 0px;
+    color: #ca1b1b;
+    font-family: 'NunitoSansCondensedSemiBold', sans-serif;
+    font-size: 14px;
+}
 .form-container-element-field label p{
     display: flex;
     align-items: right;
@@ -137,13 +144,21 @@ body .form-container{
     color: #202224;
     letter-spacing: -0.11px;
 }
-.form-container-element-title p{
+.form-container-element-title h3{
     margin: 0 0 0 0;
     text-align: center;
     font-family: 'NunitoSansCondensedBold', sans-serif;
     font-size: 12pt;
     color:#656565;
 }
+.form-container-element-title p{
+    margin: 0 0 0 0;
+    text-align: left;
+    font-family: 'NunitoSansCondensedBold', sans-serif;
+    font-size: 14px;
+    color:#ca1b1b;
+}
+
 
 
 .form-container-element-checkbox{
@@ -207,6 +222,7 @@ body .form-container{
     display: flex;
     width: 100%;
     margin: 20px 0 0 0;
+    text-align: center;
     justify-content: center;
     align-items: center;
 }
