@@ -1,20 +1,44 @@
-{% extends 'base.html' %}
+{% from 'macro.html' import render_logo, render_field, render_submit, render_login_password, render_checkbox %}
 
-{% block content %}
-<form action="" method="post">
-    {{ form.csrf_token() }}
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-    {% for field in form if field.name != "csrf_token" %}
-    <p>{{ field.label() }}</p>
-    <p>{{ field }}</p>
-    {% endfor %}
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Saby Combat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images-utils/favicon.ico') }}">
+</head>
+
+<body>
+    <form action="" method="post" class="form-container">
+        {{ form.csrf_token }}
+        {{ render_logo() }}
+        <div class="form-container-element-title">
+            <h2>Войти в аккаунт</h2>
+        </div>
+        <div class="form-container-element-title">
+            <h3>Пожалуйста, введите логин (игровой никнейм) и пароль, чтобы продолжить</h3>
+        </div>
+        {{ render_field(form.username) }}
+        {{ render_login_password(form.password) }}
+        {{ render_checkbox(form.remember) }}
+
+        {% with errors = get_flashed_messages(category_filter=["login-fail"]) %}
+        {% if errors %}
+            {% for err in errors %}
+            <div class="form-container-element-title">
+                <p>{{ err }}</p>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {{ render_submit(form.submit) }}
+        <div class="form-container-element-login">
+            <p>Еще нет аккаунта? <a href="{{url_for('register_page')}}"> Зарегистрироваться</a></p>
+        </div>
+    </form>
+</body>
+
+</html>
