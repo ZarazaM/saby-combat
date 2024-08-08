@@ -1,7 +1,7 @@
 from saby_combat import db_engine
 from sqlalchemy import text
 import uuid
-from flask import jsonify
+from flask import jsonify, abort
 from flask_login import current_user
 from flask_mail import Message
 from datetime import datetime
@@ -158,6 +158,51 @@ def send_confirmation_email(to: str, subject: str, html_template: str) -> None:
     return
 
 
+def send_referral_prize(referrer_uuid: str) -> None:
+    query_status = db.session.execute(
+        text(
+            """
+            UPDATE user_coins
+            SET total_coins = total_coins + :prize, current_coins = current_coins + :prize
+            WHERE user_id = (SELECT id FROM users WHERE referral_link = :referrer)
+            RETURNING user_id
+            """
+        ).params(
+            prize=10000,
+            referrer=referrer_uuid
+        )
+    ).scalar()
+    if query_status != None:
+        db.session.commit()
+        return
+    else:
+        abort(404, description="Некорректная реферальная ссылка")
+        #raise Exception(f"Пользователь c uuid = {referrer_uuid} не найден")
+
+
+def add_friend_by_uuid(user: Users, uuid: str) -> None:
+    query_status = db.session.execute(
+        text(
+            """
+            INSERT INTO friends(user_id, friend_id)
+            (SELECT id, :user_id as friend
+            FROM users
+            WHERE referral_link = :user_uuid)
+            RETURNING user_id
+            """
+        ).params(
+            user_id=user.id,
+            user_uuid=uuid
+        )
+    ).scalar()
+    if query_status != None:
+        db.session.commit()
+        return
+    else:
+        abort(404, description=f"Пользователь c uuid = {uuid} не найден")
+        #raise Exception(f"Пользователь c uuid = {uuid} не найден")
+
+
 # Возвращает 'True', если пользователь подтвержден,
 # иначе - 'False'
 def is_user_confirmed(user: Users) -> bool:
@@ -212,6 +257,22 @@ def get_user_by_email(email_adress: str) -> Users:
         text("SELECT * FROM users where email=:email").params(email=email_adress)
     ).first()
     return user
+
+
+def is_existing_uuid(uuid: str) -> bool:
+    query_status = db.session.execute(
+        text(
+            """
+            SELECT id FROM users WHERE referral_link = :current_uuid
+            """
+        ).params(
+            current_uuid=uuid
+        )
+    ).scalar()
+    if query_status is None:
+        return False
+    return True
+
 
 
 # Создает запись о новом пользователе по данным

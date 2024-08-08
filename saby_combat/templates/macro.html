@@ -1,0 +1,42 @@
+{% macro render_logo() %}
+    <div class="form-container-element-logo">
+        <h2><span>Saby</span>Combat</h2>
+    </div>
+{% endmacro %}
+
+
+{% macro render_field(field) %}
+    <div class="form-container-element-field">
+        <label>{{ field.label.text }}</label>
+        {{ field(**kwargs)|safe }}
+        {% for error in field.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+
+{% macro render_login_password(field) %}
+    <div class="form-container-element-field">
+        <label>{{ field.label.text }} <p>Забыли пароль?</p></label>
+        {{ field(**kwargs)|safe }}
+        {% for error in field.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+
+{% macro render_checkbox(field) %}
+    <div class="form-container-element-checkbox">
+        {{ field(**kwargs)|safe }}
+        <label for="{{ field.name }}">{{field.label.text}}</label>
+    </div>
+{% endmacro %}
+
+
+{% macro render_submit(field) %}
+    <div class="form-container-element-submit">
+        {{ field(**kwargs)|safe }}
+    </div>
+{% endmacro %}

@@ -34,14 +34,14 @@ class Password(object):
             
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
-    email_adress = EmailField('Email', validators=[DataRequired(), Email(check_deliverability=True)])
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=30)])
-    surname = StringField('Surname', validators=[DataRequired(), Length(min=2, max=30)])
-    patronymic = StringField('Patronymic', validators=[Optional(), Length(min=2, max=30)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6), Password(50)])
-    password_submit = PasswordField('Password_submit', validators=[EqualTo('password')])
-    submit = SubmitField()
+    username = StringField('Логин', validators=[DataRequired(), Length(min=2, max=50)])
+    email_adress = EmailField('Электронная почта', validators=[DataRequired(), Email(check_deliverability=True)])
+    name = StringField('Имя', validators=[DataRequired(), Length(min=2, max=30)])
+    surname = StringField('Фамилия', validators=[DataRequired(), Length(min=2, max=30)])
+    patronymic = StringField('Отчество', validators=[Optional(), Length(min=2, max=30)])
+    password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6, max=50), Password()])
+    password_submit = PasswordField('Подтвердите пароль', validators=[EqualTo('password', message="Пароли должны совпадать")])
+    submit = SubmitField('Зарегистрироваться')
 
     def validate_username(form, field):
         existing_user = get_user_by_username(field.data)
@@ -55,7 +55,7 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField()
+    username = StringField('Логин', validators=[DataRequired(), Length(min=2, max=50)])
+    password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6, max=50)])
+    remember = BooleanField('Запомнить пароль')
+    submit = SubmitField('Войти')
