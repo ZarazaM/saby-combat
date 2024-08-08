@@ -145,13 +145,24 @@ def add_new_user(form) -> Users:
     db.session.commit()
     return user
 
+def get_all_levels():
+    """Получить все уровни из таблицы levels"""
+    result = db.session.execute(text("SELECT id, level_name, coins_required, coins_per_click FROM levels ORDER BY id")).fetchall()
+    return result
 
 def get_data_for_main_page():
-    """Получить запись с монетами для текущего пользователя, его вес за клик по уровню и пассивный доход"""
+    """Получить все нужные данные для главной страницы"""
     result = db.session.execute(
         text(
             """
-            SELECT uc.current_coins, uc.coins_per_second, l.coins_per_click
+            SELECT 
+                uc.current_coins, 
+                uc.coins_per_second, 
+                l.coins_per_click, 
+                l.level_name, 
+                l.coins_required, 
+                l.id,
+                (SELECT MAX(id) FROM levels) AS max_level
             FROM user_coins uc
             JOIN levels l ON uc.level_id = l.id
             WHERE uc.user_id = :user_id
@@ -163,22 +174,30 @@ def get_data_for_main_page():
 
     if result:
         return {
-            'current_coins': result[0],
-            'coins_per_second': result[1],
-            'coins_per_click': result[2]
+             'current_coins': result[0],
+             'coins_per_second': result[1],
+             'coins_per_click': result[2],
+             'name_current_level': result[3],
+             'goal_level': result[4],
+             'current_level': result[5],
+             'max_level': result[6]
         }
     else:
         return {
             'current_coins': 0,
             'coins_per_second': 0,
-            'coins_per_click': 0
+            'coins_per_click': 0,
+            'name_current_level': 'Дрон',
+            'goal_level': 0,
+            'current_level': 1,
+            'max_level': 1
         }
 
 
 def submit_clicks_to_db(data):
     clicks = int(data.get('clicks', 0))
-    money = int(data.get('money', 0))
-    coinsPerSecondAccumulated = int(data.get('coinsPerSecondAccumulated', 0))
+    money = float(data.get('money', 0))
+    coinsPerSecondAccumulated = float(data.get('coinsPerSecondAccumulated', 0))
 
     # рекорд за секунду 16 кликов, умножаем на 30 секунд
     if clicks > 480:

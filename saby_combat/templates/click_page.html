@@ -2,15 +2,44 @@
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul class=flashes>
+        <ul class="flashes">
         {% for message in messages %}
         <li>{{ message }}</li>
         {% endfor %}
         </ul>
     {% endif %}
-    {% endwith %}
+{% endwith %}
 <button type="button" id="click-button">Click here to gain money</button>
 <p>Монеты: </p><p><span id="money-count">{{ money }}</span></p>
 <p>Прибыль за клик: </p><p><span id="coins_per_click">{{ coins_per_click }}</span></p>
 <p>Пассивный доход: </p><p><span id="coins_per_second">{{ coins_per_second }}</span></p>
+<p>Цель: </p><p><span id="goal-level">{{ goal_level }}</span></p>
+<p>Название текущего уровня: </p><p><span id="name-current-level">{{ name_current_level }}</span></p>
+<p>Текущий уровень: </p><p><span id="current-level">{{ current_level }}</span></p>
+<p>Максимально возможный уровень: </p><p><span id="max-level">{{ max_level }}</span></p>
+
+<progress id="progress-bar" value="{{ current_coins }}" max="{{ goal_level }}"></progress>
+
+<!-- Таблица уровней -->
+<h2>Все уровни</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Название</th>
+            <th>Прибыль за клик</th>
+            <th>Цель</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for level in levels %}
+        <tr>
+            <td>{{ level[0] }}</td> <!-- ID -->
+            <td>{{ level[1] }}</td> <!-- Название уровня -->
+            <td>{{ level[3] }}</td> <!-- Прибыль за клик -->
+            <td>{{ level[2] }}</td> <!-- Требуемые монеты -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
