@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -19,5 +18,4 @@
 </script>
 <button type="button" onClick="onClick()">click here to gain money</button>
 <p>Clicks: <a id="clicks">0</a></p>
-
 {% endblock %}

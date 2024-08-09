@@ -1,6 +1,7 @@
 body{
     margin: 0;
     display: flex;
+    min-height: 100vh;
 }
 @font-face {
     font-family: 'NunitoSansCondensedSemiBold';
@@ -35,7 +36,7 @@ nav{
 }
 .logo-sidebar h2{
     font-family: 'NunitoSansCondensedExtraBold', sans-serif;
-    font-size: 24;
+    font-size: 24px;
     color: #202224;
 }
 .logo-sidebar span{
@@ -139,4 +140,81 @@ main{
     align-items: center;
     width: 83.26vw;
     background-color: #F5F6FA;
+    flex-grow: 1;
+}
+
+@media screen and (max-width: 1150px) {
+    .text-menu-element, .description-menu{
+        font-size: calc(5px + 0.8vw);
+    }
+    .block {
+        gap: calc(1px + 3%);
+    }
+    .side-decoration{
+        display: none;
+    }
+    .logo-sidebar h2{
+        font-size: calc(10px + 1vw);
+    }
+}
+
+@media screen and (max-width: 1000px){
+    body{
+        flex-direction: column;
+    }
+    main{
+        width: 100%;
+    }
+    .container{
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding: 10px;
+    }
+    nav{
+        height: auto;
+        width: -webkit-fill-available;
+    }
+    .menu{
+        flex-direction: row;
+            gap: 3vw;
+    }
+    .description-menu, .container hr{
+        display: none;
+    }
+    .logo-sidebar h2{
+        margin: 10%;
+    }
+    .logo-sidebar{
+        width: fit-content;
+    }
+    .block{
+        width: 8.24vw;
+        padding: 5px 10px;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .text-menu-element{
+        margin: 5px 0
+    }
+}
+
+@media screen and (max-width: 770px){
+    .logo-sidebar{
+        display: none;
+    }
+    .block{
+        padding: 10px 15px;
+    }
+}
+
+@media screen and (max-width: 580px){
+    .text-menu-element{
+        display: none;
+    }
+    .block-for-img{
+        margin: 0;
+    }
+    .block {
+        padding: 10px;
+    }
 }
