@@ -1,20 +1,39 @@
-{% extends 'base.html' %}
+{% from 'macro.html' import render_field, render_submit %}
 
-{% block content %}
-    <form action="/auth" method="post">
+<!DOCTYPE html>
+<html lang="en">
 
-    <label for="email">Email: </label>
-    <input type="text" id="email" name="email"/>
+<head>
+    <meta charset="UTF-8">
+    <title>Saby Combat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register_style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images-utils/favicon.ico') }}">
+</head>
 
-    <label for="login">Login: </label>
-    <input type="text" id="login" name="login"/>
+<body>
+    <form action="" method="post" class="form-container">
+        {{ form.csrf_token }}
+        <div class="form-container-element-logo">
+            <h2><span>Saby</span>Combat</h2>
+        </div>
+        <div class="form-container-element-title">
+            <h2>Регистрация</h2>
+        </div>
+        <div class="form-container-element-title">
+            <p>Создайте аккаунт, чтобы продолжить</p>
+        </div>
+        {{ render_field(form.email_adress) }}
+        {{ render_field(form.username) }}
+        {{ render_field(form.surname) }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.patronymic) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.password_submit) }}
+        {{ render_submit(form.submit) }}
+        <div class="form-container-element-login">
+            <p>Уже есть аккаунт? <a href="{{url_for('login_page')}}"> Войти</a></p>
+        </div>
+    </form>
+</body>
 
-    <label for="password">Password: </label>
-    <input type="password" id="password" name="password"/>
-
-    <label for="confirm_password">Password: </label>
-    <input type="password" id="confirm_password" name="confirm_password"/>
-
-    <button type="submit">Войти</button>
-</form>
-{% endblock %}
+</html>
