@@ -1,176 +1,170 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Сообщества</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #eeeeee; /* Очень бледно зелёный фон */
-        }
-        .container_invitations {
-            max-width: 90%; /* Максимальная ширина контейнера */
-            margin: 0 auto; /* Центрируем контейнер по горизонтали */
-            padding: 20px; /* Внутренние отступы вокруг содержимого */
-            background-color: #f9f9f9; /* Светлый фон для контейнера */
-            border: 1px solid #ddd; /* Серая рамка вокруг контейнера */
-            border-radius: 8px; /* Скругление углов контейнера */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для создания глубины */
-        }
-        .container {
-            margin-bottom: 2cm; /* Отступ между div */
-            padding: 2cm; /* Внутренние отступы */
-            background-color: #e6f9e6; /* Светло-зеленый фон */
-            border-radius: 12px; /* Скругление углов */
-            padding: 20px; /* Внутренние отступы */
-            display: flex; /* Используем flexbox для выравнивания элементов */
-            align-items: center; /* Центрируем элементы по вертикали */
-            justify-content: space-between; /* Располагаем элементы по краям */
-            max-width: 90%; /* Максимальная ширина контейнера (90% от ширины окна) */
-            margin: auto; /* Центрируем контейнер на странице */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта подъема */
-        }
-        .section {
-            margin-bottom: 20px; /* Отступ между div */
-            padding: 20px; /* Отступы внутри секции */
-            background-color: #f9f9f9; /* Цвет фона секции */
-            border-radius: 8px; /* Скругление углов секции */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Небольшая тень для создания эффекта подъема */
-            max-width: 90%; /* Максимальная ширина секции (90% от ширины окна) */
-            margin: auto; /* Центрирование секции на странице */
-            padding-left: 30px; /* Левый отступ */
-            padding-right: 30px; /* Правый отступ */
-        }
+{% extends 'base.html' %}
 
-         /* Стили для кнопки добавления друга */
-        .btn-primary {
-            background-color: green; /* Зелёный фон кнопки */
-            color: white; /* Белый текст кнопки */
-            border: none; /* Убираем рамку */
-            padding: 10px 20px; /* Внутренние отступы кнопки */
-            border-radius: 4px; /* Скругляем углы кнопки */
-            cursor: pointer; /* Курсор при наведении */
-            float: right; /* Перемещение кнопки вправо */
-        }
-        .no-list {
-            list-style: none; /* Убираем маркеры */
-            padding: 0; /* Убираем внутренние отступы */
-            margin: 0; /* Убираем внешние отступы */
-        }
-        .table-container::-webkit-scrollbar {
-            display: none; /* Скрываем ползунок для WebKit-браузеров */
-        }
-        .table-container {
-            width: 100%; /* Ширина контейнера 100% */
-            max-height: 250px; /* Максимальная высота для контейнера таблицы */
-            overflow-y: hidden; /* Скрыть вертикальную прокрутку */
-            border: 1px solid #ddd; /* Рамка вокруг контейнера */
-            border-radius: 8px; /* Скругление углов контейнера таблицы */
-            overflow-y: auto; /* Добавление вертикальной прокрутки */
-        }
-        .table-container {
-            -ms-overflow-style: none;  /* Internet Explorer and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
 
-        table {
-            width: 100%; /* Ширина таблицы 100% */
-            border-collapse: collapse; /* Убираем разрывы между ячейками */
-        }
-        thead {
-            position: sticky; /* Делаем заголовок "липким" */
-            top: 0; /* Прикрепляем его к верхней части контейнера */
-            background-color: #f2f2f2; /* Цвет фона заголовка */
-            z-index: 1; /* Устанавливаем z-index, чтобы заголовок был выше других элементов */
-        }
+{% block content %}
+<style>
 
-        th, td {
-            padding: 10px; /* Отступы в ячейках */
-            text-align: left; /* Выравнивание текста по левому краю */
-            border-bottom: 1px solid #ddd; /* Нижняя граница для ячеек */
-        }
-        tr {
-            display: table; /* Обеспечиваем правильное отображение строк в блочном контексте */
-            width: 100%; /* Устанавливаем ширину на 100% */
-            table-layout: fixed; /* Фиксируем раскладку таблицы */
-        }
-        .button-container {
-            float: right; /* Перемещение кнопки вправо */
-        }
+    .container_invitations {
+        max-width: 90%; /* Максимальная ширина контейнера */
+        margin: 0 auto; /* Центрируем контейнер по горизонтали */
+        padding: 20px; /* Внутренние отступы вокруг содержимого */
+        background-color: #f9f9f9; /* Светлый фон для контейнера */
+        border: 1px solid #ddd; /* Серая рамка вокруг контейнера */
+        border-radius: 8px; /* Скругление углов контейнера */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для создания глубины */
+    }
+    .1container {
+        margin-bottom: 2cm; /* Отступ между div */
+        padding: 2cm; /* Внутренние отступы */
+        background-color: #e6f9e6; /* Светло-зеленый фон */
+        border-radius: 12px; /* Скругление углов */
+        padding: 20px; /* Внутренние отступы */
+        display: flex; /* Используем flexbox для выравнивания элементов */
+        align-items: center; /* Центрируем элементы по вертикали */
+        justify-content: space-between; /* Располагаем элементы по краям */
+        max-width: 90%; /* Максимальная ширина контейнера (90% от ширины окна) */
+        margin: auto; /* Центрируем контейнер на странице */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта подъема */
+    }
+    .1section {
+        margin-bottom: 20px; /* Отступ между div */
+        padding: 20px; /* Отступы внутри секции */
+        background-color: #f9f9f9; /* Цвет фона секции */
+        border-radius: 8px; /* Скругление углов секции */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Небольшая тень для создания эффекта подъема */
+        max-width: 90%; /* Максимальная ширина секции (90% от ширины окна) */
+        margin: auto; /* Центрирование секции на странице */
+        padding-left: 30px; /* Левый отступ */
+        padding-right: 30px; /* Правый отступ */
+    }
 
-        .button {
-            padding: 10px 15px; /* Внутренние отступы для кнопок */
-            text-decoration: none; /* Убираем подчеркивание */
-            color: white; /* Цвет текста */
-            border-radius: 5px; /* Скругление углов кнопок */
-            float: right; /* Перемещение кнопки вправо */
-        }
+     /* Стили для кнопки добавления друга */
+    .btn-primary {
+        background-color: green; /* Зелёный фон кнопки */
+        color: white; /* Белый текст кнопки */
+        border: none; /* Убираем рамку */
+        padding: 10px 20px; /* Внутренние отступы кнопки */
+        border-radius: 4px; /* Скругляем углы кнопки */
+        cursor: pointer; /* Курсор при наведении */
+        float: right; /* Перемещение кнопки вправо */
+    }
+    .no-list {
+        list-style: none; /* Убираем маркеры */
+        padding: 0; /* Убираем внутренние отступы */
+        margin: 0; /* Убираем внешние отступы */
+    }
+    .table-container::-webkit-scrollbar {
+        display: none; /* Скрываем ползунок для WebKit-браузеров */
+    }
+    .table-container {
+        width: 100%; /* Ширина контейнера 100% */
+        max-height: 250px; /* Максимальная высота для контейнера таблицы */
+        overflow-y: hidden; /* Скрыть вертикальную прокрутку */
+        border: 1px solid #ddd; /* Рамка вокруг контейнера */
+        border-radius: 8px; /* Скругление углов контейнера таблицы */
+        overflow-y: auto; /* Добавление вертикальной прокрутки */
+    }
+    .table-container {
+        -ms-overflow-style: none;  /* Internet Explorer and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
 
-        .button.red {
-            background-color: red; /* Красный цвет для отказа */
-        }
+    table {
+        width: 100%; /* Ширина таблицы 100% */
+        border-collapse: collapse; /* Убираем разрывы между ячейками */
+    }
+    thead {
+        position: sticky; /* Делаем заголовок "липким" */
+        top: 0; /* Прикрепляем его к верхней части контейнера */
+        background-color: #f2f2f2; /* Цвет фона заголовка */
+        z-index: 1; /* Устанавливаем z-index, чтобы заголовок был выше других элементов */
+    }
 
-        .button.green {
-            background-color: green; /* Зеленый цвет для принятия */
-        }
+    th, td {
+        padding: 10px; /* Отступы в ячейках */
+        text-align: left; /* Выравнивание текста по левому краю */
+        border-bottom: 1px solid #ddd; /* Нижняя граница для ячеек */
+    }
+    tr {
+        display: table; /* Обеспечиваем правильное отображение строк в блочном контексте */
+        width: 100%; /* Устанавливаем ширину на 100% */
+        table-layout: fixed; /* Фиксируем раскладку таблицы */
+    }
+    .1button-container {
+        float: right; /* Перемещение кнопки вправо */
+    }
 
-        .username-link {
-            text-decoration: underline; /* Подчеркивание для ссылки */
-            color: blue; /* Цвет ссылки */
-        }
-        .button_for_clan {
-            padding: 10px 15px;
-            text-decoration: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            border: none;
-            display: inline-block;
-        }
-        .button.create-clan {
-            background-color: green; /* Зеленый цвет для кнопки Создать клан */
-            float: right; /* Перемещение кнопки вправо */
-        }
-        .modal {
-            display: none; /* Скрываем по умолчанию */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
-        }
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 8px; /* Скругление углов */
-        }
-        .modal-header {
-            color: green; /* Зелёные буквы в заголовке */
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .btn_for_clan_container {
-            clear: both; /* Очищаем float */
-            margin-top: 20px; /* Отступ сверху */
-        }
+    .1button {
+        padding: 10px 15px; /* Внутренние отступы для кнопок */
+        text-decoration: none; /* Убираем подчеркивание */
+        color: white; /* Цвет текста */
+        border-radius: 5px; /* Скругление углов кнопок */
+        float: right; /* Перемещение кнопки вправо */
+    }
 
-    </style>
-</head>
-<body>
+    .1button.red {
+        background-color: red; /* Красный цвет для отказа */
+    }
+
+    .1button.green {
+        background-color: green; /* Зеленый цвет для принятия */
+    }
+
+    .username-link {
+        text-decoration: underline; /* Подчеркивание для ссылки */
+        color: blue; /* Цвет ссылки */
+    }
+    .1button_for_clan {
+        padding: 10px 15px;
+        text-decoration: none;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+        display: inline-block;
+    }
+    .1button.create-clan {
+        background-color: green; /* Зеленый цвет для кнопки Создать клан */
+        float: right; /* Перемещение кнопки вправо */
+    }
+    .modal {
+        display: none; /* Скрываем по умолчанию */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+    }
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px; /* Скругление углов */
+    }
+    .modal-header {
+        color: green; /* Зелёные буквы в заголовке */
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .btn_for_clan_container {
+        clear: both; /* Очищаем float */
+        margin-top: 20px; /* Отступ сверху */
+    }
+
+</style>
+
 <div>
     <h1>Друзья</h1>
-    <div class="section">
+    <div class="1section">
         <div class="table-container">
             <table class="table table-bordered table-striped">
                 <thead>
@@ -211,7 +205,7 @@
     </div>
 </div>
 
-<div class="container">
+<div class="1container">
     <p>Добавляйте друзей по ссылке. Если ваш друг ещё не зарегистрирован, вам начислится бонус в размере 10 000
         монет.</p>
     <button id="copy-link" class="btn btn-primary mt-4">Копировать ссылку на профиль</button>
@@ -229,19 +223,19 @@
                 clan_id=clan_id, clan_info=clan_info, members=members, invitations=view_invitations, form=clan_form)}}"
                    class="username-link">{{ invitations[i][0] }}</a>
                 приглашает вас в клан {{ invitations[i][1] }}
-                <div class="button-container">
+                <div class="1button-container">
                     <form method="POST" action="">
                         <input type="hidden" name="do_user" value="accept">
                         <input type="hidden" name="invitation_id" value="{{ invitations[i][1] }}">
-                        <button type="submit" class="button green">Вступить</button>
+                        <button type="submit" class="1button green">Вступить</button>
                     </form>
                 </div>
 
-                <div class="button-container">
+                <div class="1button-container">
                     <form method="POST" action="">
                         <input type="hidden" name="do_user" value="decline">
                         <input type="hidden" name="invitation_id" value="{{ invitations[i][1] }}">
-                        <button type="submit" class="button red">Отказаться</button>
+                        <button type="submit" class="1button red">Отказаться</button>
                     </form>
                 </div>
             </li>
@@ -256,9 +250,9 @@
 
 <div>
     {% if clan_info == None %}
-    <div class="container">
+    <div class="1container">
         <!-- Кнопка Создать клан -->
-        <button class="button create-clan" id="createClanButton">Создать клан</button>
+        <button class="1button create-clan" id="createClanButton">Создать клан</button>
 
         <!-- Модальное окно -->
         <div class="modal" id="clanModal">
@@ -278,8 +272,8 @@
                         {% endfor %}
                     </div>
                     <div class="btn-container">
-                        <button type="submit" class="button">Создать</button>
-                        <button type="button" class="button red" id="cancelButton">Отменить</button>
+                        <button type="submit" class="1button">Создать</button>
+                        <button type="button" class="1button red" id="cancelButton">Отменить</button>
                     </div>
                 </form>
             </div>
@@ -290,11 +284,11 @@
 <!-- Скрытая таблица -->
 <div id="clanTableContainer">
     {% if clan_info != None %}
-    <div class="section">
-        <div class="button-container">
+    <div class="1section">
+        <div class="1button-container">
             <form method="POST" action="">
                 <input type="hidden" name="management" value="delete_clan">
-                <button type="submit" class="button red">Удалить клан</button>
+                <button type="submit" class="1button red">Удалить клан</button>
             </form>
         </div>
         <div class="table-container">
@@ -410,8 +404,5 @@
             clanModal.style.display = 'none';
         }
     });
-
-
 </script>
-</body>
-</html>
+{% endblock %}

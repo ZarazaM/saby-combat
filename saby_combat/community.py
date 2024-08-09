@@ -1,8 +1,7 @@
-import secrets
 
-from flask import Flask, render_template, request, redirect, url_for, abort
-# from flask_login import login_required
-from flask_sqlalchemy import SQLAlchemy
+from saby_combat import db, app
+from flask import request, redirect, url_for, abort
+
 from flask_wtf import FlaskForm
 from sqlalchemy.sql import text
 from wtforms.fields.simple import StringField, SubmitField
@@ -15,21 +14,10 @@ from wtforms.validators import DataRequired, Length
 # О добавлении друзей по ссылке: если пользователь перешёл по ней, то он перенаправлен на страницу регистрации или
 # входа. После нужно создать запись в таблице friends. После нужно (возможно реактивно) отобразить новый список друзей.
 
-
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:123poi098@localhost:5432/saby_combat'
-db = SQLAlchemy(app)
-app.config['SECRET_KEY'] = secrets.token_hex(16)
-
-engine = db.create_engine("postgresql+psycopg2://postgres:123poi098@localhost:5432/saby_combat", echo=False)
-conn = engine.connect()
-Session = db.sessionmaker(bind=engine)
-session = db.Session()
-
-referral_link = 'zmuipswjy'
-# referral_link = 'tosjchekg'
-# referral_link = 'sgyjlkjty'
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:123poi098@localhost:5432/saby_combat'
+# db = SQLAlchemy(app)
+# app.config['SECRET_KEY'] = BaseConfig.SECRET_KEY
 
 
 class ClanForm(FlaskForm):
@@ -38,64 +26,9 @@ class ClanForm(FlaskForm):
 
 
 # Это основной интерфейс для взаимодействия со страницей друзья.
-@app.route('/community', methods=['GET', 'POST'])
-# @login_required
-def community():
-    fr_data = table_friends(referral_link)  # друзья
-    clan__id = is_in_clan(referral_link)  # клан пользователя
-    clan_info = None
-    members = None
-    clan_form = ClanForm()
-    if clan__id:  # если пользователь находится в клане, то получим информацию о его клане
-        clan_info, members = table_clans(referral_link)
-    view_invitations = clan_invitations_view(referral_link)  # информация о приглашениях в клан
-    if clan__id is None and is_leader(referral_link) is None and clan_form.validate_on_submit():
-        action_clan = clan_form.submit.data
-        print('Что-то')
-        print(f'action_clan = {clan_form.clan_name.data}')
-        if clan_form.clan_name.data is not None:
-            create_clan(referral_link, clan_form.clan_name.data)
-            print(f'clan_info = {clan_info}')
-            return redirect(url_for('community'))
-
-    if request.method == 'POST' and is_leader(referral_link) is None:
-        action = request.form.get('do_user')  # информация о действии пользователя относительно приглашений в кланы
-        clan_name = request.form.get('invitation_id')
-        clan_id1 = for_name(clan_name)
-        invitation_id = id_invitations(clan_id1, referral_link)
-        if action == 'accept':
-            clan_invitation_from_user(referral_link, 'accept', invitation_id)
-        elif action == 'decline':
-            clan_invitation_from_user(referral_link, 'decline', invitation_id)
-        return redirect(url_for('community'))
-
-    # управление кланом: есть клан, пользователь -- лидер и это POST запрос.
-    if clan__id is not None and is_leader(referral_link) is not None and request.method == 'POST':
-        action_leader = request.form.get('management')
-        if action_leader == 'delete_clan':
-            delete_clan(clan__id)
-            return redirect(url_for('community'))
-        elif action_leader == 'add_user':
-            invite_user(referral_link, clan__id)
-            return redirect(url_for('community'))
-    if clan__id:
-        leader_id = is_leader(referral_link)
-        if leader_id:
-            return render_template('friends.html',
-                                   friends=fr_data, referral_link=referral_link, clan_id=clan__id, clan_info=clan_info,
-                                   members=members, invitations=view_invitations, is__leader=True, form=clan_form)
-        else:
-            return render_template('friends.html',
-                                   friends=fr_data, referral_link=referral_link, clan_id=clan__id, clan_info=clan_info,
-                                   members=members, invitations=view_invitations, is__leader=False, form=clan_form)
-    else:
-        return render_template('friends.html',
-                               friends=fr_data, referral_link=referral_link, clan_id=clan__id, clan_info=clan_info,
-                               members=members, invitations=view_invitations, form=clan_form)
-
 
 def id_invitations(clan_id1, referral_link1):
-    id_invitation = conn.execute(text("""
+    id_invitation = db.session.execute(text("""
     SELECT cl_in.invitation_id FROM clan_invitations AS cl_in JOIN users AS u ON u.id = cl_in.user_id
     WHERE cl_in.clan_id = :cl_id AND u.referral_link = :ref_link;
     """).params(cl_id=clan_id1, ref_link=referral_link1)).scalar()
@@ -111,12 +44,12 @@ def table_friends(referral_link):
     JOIN user_info as ui ON ui.user_id = u.id
     WHERE fr.user_id = (SELECT id FROM users WHERE referral_link = :referral_link);
     ''')
-    sql_select = conn.execute(query_friend, {'referral_link': str(referral_link)})
+    sql_select = db.session.execute(query_friend, {'referral_link': str(referral_link)})
     if len(sql_select.fetchall()) == 0:
         fr_date = {key: None for key in sql_select.keys()}
     else:
-        fr_date = {key: [] for key in conn.execute(query_friend, {'referral_link': str(referral_link)}).keys()}
-        for row in conn.execute(query_friend, {'referral_link': str(referral_link)}).fetchall():
+        fr_date = {key: [] for key in db.session.execute(query_friend, {'referral_link': str(referral_link)}).keys()}
+        for row in db.session.execute(query_friend, {'referral_link': str(referral_link)}).fetchall():
             for key, value in zip(fr_date.keys(), row):
                 fr_date[key].append(value)
     return fr_date
@@ -126,7 +59,7 @@ def table_friends(referral_link):
 # запить в таблицу friends. А в случае перехода на страницу регистрации и валидации данных там, пользователь получит\
 # дополнительно 10 000 монет.
 def for_name(clan_name):
-    id_clan = conn.execute(text("""
+    id_clan = db.session.execute(text("""
     SELECT id FROM clans WHERE clan_name = :cl_name
     """).params(cl_name=clan_name)).scalar()
     return id_clan
@@ -143,10 +76,10 @@ def table_clans(referral_link):
     SELECT cl.id FROM clans AS cl JOIN users AS us ON us.clan_id = cl.id
     WHERE us.referral_link = :referral_link;
     """)
-    select_clan_id = conn.execute(query_clan_id, {'referral_link': str(referral_link)})
+    select_clan_id = db.session.execute(query_clan_id, {'referral_link': str(referral_link)})
     row_clan = str(select_clan_id.fetchall()[0][0])  # clan_id для нашего пользователя
     # тут запрос для клана пользователя -- возвращает одномерный массив
-    query_clans = text("""
+    query_clans = db.session.execute(text("""
     SELECT cl.clan_name,
     (SELECT u.username FROM users AS u JOIN clans AS cl ON cl.id = u.clan_id WHERE cl.id = :clan_id AND u.id 
     = cl.leader_id) AS leader, CAST(SUM(uc.click_count) AS varchar(30)) AS total_click, CAST(SUM(uc.total_coins) AS 
@@ -154,18 +87,19 @@ def table_clans(referral_link):
     JOIN user_coins AS uc ON uc.user_id = u.id
     WHERE cl.id = :clan_id
     GROUP BY cl.clan_name;
-    """)
+    """).params(clan_id=row_clan)).fetchone()
     # Содержит строку: наименование клана, его лидера, общее количество заработанных монет и кликов.
-    select_clans = conn.execute(query_clans, {'clan_id': str(row_clan)})
-    clan_info = list(select_clans.fetchall()[0])
+
+    if query_clans is not None:
+        clan_info = query_clans[0]
     # получение всех пользователей, состоящих в клане -- возвращает одномерный массив
-    query_users = text("""
-    SELECT us.username FROM users AS us JOIN clans AS cl ON cl.id = us.clan_id
-    WHERE cl.id = :clan_id;
-    """)
-    select_users = conn.execute(query_users, {'clan_id': str(row_clan)}).fetchall()
-    members = [select_users[i][0] for i in range(len(select_users))]
-    return clan_info, members
+        query_users = text("""
+        SELECT us.username FROM users AS us JOIN clans AS cl ON cl.id = us.clan_id
+        WHERE cl.id = :clan_id;
+        """)
+        select_users = db.session.execute(query_users, {'clan_id': str(row_clan)}).fetchall()
+        members = [select_users[i][0] for i in range(len(select_users))]
+        return clan_info, members
 
 
 # если пользователь не в клане, возвращает False, иначе возвращает id клана.
@@ -174,7 +108,7 @@ def is_in_clan(referral_link):
             SELECT cl.id FROM clans AS cl JOIN users AS u ON u.clan_id = cl.id
             WHERE u.referral_link = :referral_link;
             """).params(referral_link=referral_link)
-    select_in__clan = conn.execute(in__clan).scalar()
+    select_in__clan = db.session.execute(in__clan).scalar()
     if select_in__clan is None:
         return None
     return select_in__clan
@@ -197,16 +131,16 @@ def clan_invitations_view(referral_link):
     # добавить проверку на приглашения в кланы
 
     # Получаем ID пользователя
-    user_id = conn.execute(text("""
+    user_id = db.session.execute(text("""
                 SELECT id FROM users WHERE referral_link = :referral_link
                 """).params(referral_link=referral_link)).scalar()
-    is_clan_invitations = conn.execute(text("""
+    is_clan_invitations = db.session.execute(text("""
         SELECT cl_in.clan_id FROM clan_invitations AS cl_in
         JOIN users AS u ON u.id = cl_in.user_id
         WHERE u.referral_link = :referral_link; """).params(referral_link=referral_link)).scalar()
     # Получаем все приглашения в кланы: лидер, клан.
     if is_clan_invitations is not None:  # результат возвращается в виде списка из двух кортежей
-        view_invitation = conn.execute(text("""
+        view_invitation = db.session.execute(text("""
         SELECT u.username, cl.clan_name
         FROM users AS u JOIN clans AS cl ON cl.id = u.clan_id
         JOIN clan_invitations AS cl_in ON cl_in.clan_id = cl.id
@@ -221,52 +155,52 @@ def clan_invitations_view(referral_link):
 def clan_invitation_from_user(referral_link, action, invitation_id):
     if action == 'accept':  # если пользователь согласился вступить в клан, добавляем его, соблюдая численность.
         # ID клана
-        select_clan_id = conn.execute(text("""
+        select_clan_id = db.session.execute(text("""
                 SELECT cl.id FROM clans AS cl JOIN clan_invitations AS cl_in ON cl_in.clan_id = cl.id
                 WHERE cl_in.invitation_id = :invitation_id;""").params(invitation_id=invitation_id)).scalar()
-        is_open = conn.execute(text("""
+        is_open = db.session.execute(text("""
         SELECT COUNT(*) FROM users AS u JOIN clans AS cl ON cl.id = u.clan_id
         WHERE cl.id = :cl_id
         """).params(cl_id=select_clan_id)).scalar()
         if select_clan_id != is_in_clan(referral_link) and is_leader(referral_link) is None:
             if is_open < 4:
                 # Добавляем пользователя в клан
-                conn.execute(text("""
+                db.session.execute(text("""
                 UPDATE users SET clan_id = :clan_id
                 WHERE referral_link = :referral_link""").params(clan_id=select_clan_id, referral_link=referral_link))
                 # удаляем приглашение пользователя в этот клан
-                conn.execute(text("""
+                db.session.execute(text("""
                 DELETE FROM clan_invitations WHERE invitation_id = :invitation_id;
                 """).params(invitation_id=invitation_id))
-                conn.commit()
+                db.session.commit()
             elif is_open == 4:
                 # Добавляем пользователя в клан
-                conn.execute(text("""
+                db.session.execute(text("""
                 UPDATE users SET clan_id = :clan_id
                 WHERE referral_link = :referral_link;""").params(clan_id=select_clan_id, referral_link=referral_link))
                 # удаляем приглашение пользователя в этот клан
-                conn.execute(text("""
+                db.session.execute(text("""
                 DELETE FROM clan_invitations WHERE invitation_id = 
                 :invitation_id;""").params(invitation_id=invitation_id))
                 # закрываем клан для вступления других пользователей
-                conn.execute(text("""
+                db.session.execute(text("""
                 UPDATE clans SET is_open = FALSE WHERE clan_id = :clan_id;""").params(clan_id=select_clan_id))
                 # Нужно удалить сообщение из видимой области в friends.html !!!!!!!!!!!!!!!!!!!!!!!!!!
-                conn.commit()
+                db.session.commit()
             else:  # Возможно достаточно выводить уведомление!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 raise abort(400, desctiption='Sorry, but that clan is full')
     elif action == 'decline':
         # Нужно удалить сообщение из видимой области в friends.html !!!!!!!!!!!!!!!!!!!!!!!!!!
-        conn.execute(text("""
+        db.session.execute(text("""
                     DELETE FROM clan_invitations WHERE invitation_id = 
                     :invitation_id;""").params(invitation_id=invitation_id))
-        conn.commit()
+        db.session.commit()
     return None
 
 
 # Проверяет, является ли введённый пользователь лидером клана/////////// проверил
 def is_leader(referral_link):
-    leader__select = conn.execute(text("""
+    leader__select = db.session.execute(text("""
     SELECT cl.leader_id FROM clans AS cl JOIN users AS u ON u.clan_id = cl.id
     WHERE cl.leader_id = (SELECT id FROM users WHERE referral_link = :referral_link)
     """).params(referral_link=referral_link)).scalar()
@@ -282,21 +216,21 @@ def is_leader(referral_link):
 # Проверь эту функцию!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 def create_clan(referral_link, clan_name):
     # В противоположном случае при нажатии на соответствующую кнопку пользователь создаёт клан
-    count_clan = conn.execute(text("""SELECT COUNT(*) FROM clans;""")).scalar()
-    conn.execute(text("""
+    count_clan = db.session.execute(text("""SELECT COUNT(*) FROM clans;""")).scalar()
+    db.session.execute(text("""
     INSERT INTO clans(id, clan_name, leader_id, is_open)
     VALUES (:id_clan,:clan_name, (SELECT id FROM users WHERE referral_link = :referral_link), TRUE)
     """).params(id_clan=count_clan + 1, clan_name=clan_name, referral_link=referral_link))
     # Добавляем лидера в клан
-    conn.execute(text("""
+    db.session.execute(text("""
     UPDATE users SET clan_id = :clan 
     WHERE referral_link = :referral_link;
     """).params(clan=count_clan + 1, referral_link=referral_link))
-    conn.execute(text("""
+    db.session.execute(text("""
     DELETE FROM clan_invitations
     WHERE user_id = (SELECT id FROM users WHERE referral_link = :referral_link)
     """).params(referral_link=referral_link))
-    conn.commit()
+    db.session.commit()
     return None
 
 
@@ -327,20 +261,20 @@ def clan_management(referral_link):
 
 # Проверь SQL запросы.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 def invite_user(referral_link, clan_id):
-    leader_id = conn.execute(text("""
+    leader_id = db.session.execute(text("""
     SELECT u.id FROM users AS u JOIN clans AS cl ON cl.id = u.clan_id
     WHERE cl.id = :clan_id AND u.id = cl.leader_id;
     """).params(clan_id=clan_id)).scalar()
-    is_friend = conn.execute(text("""
+    is_friend = db.session.execute(text("""
     SELECT u.id FROM users AS u JOIN friends AS fr ON fr.user_id = u.id
     WHERE fr.user_id = :leader AND u.id = (SELECT id FROM users WHERE referral_link = :referral_link);
     """).params(leader=leader_id, referral_link=referral_link)).scalar()
     if is_in_clan(referral_link) is False and is_friend is not None:
-        conn.execute(text("""
+        db.session.execute(text("""
         INSERT INTO clan_invitations(user_id, clan_id, sender_id, status) 
         VALUES ((SELECT id FROM users WHERE referral_link = :referral_link), :clan__id, :sender__id, :status_str)
         """).params(referral_link=referral_link, clan__id=clan_id, sender__id=leader_id, status__str='pending'))
-        conn.commit()
+        db.session.commit()
     else:
         return False
 
@@ -349,19 +283,19 @@ def invite_user(referral_link, clan_id):
 def delete_clan(clan_id):
     try:
         # получим id всех пользователей, входящих в клан
-        users_in_clans = conn.execute(text("""
+        users_in_clans = db.session.execute(text("""
         SELECT u.id FROM users AS u JOIN clans AS cl ON cl.id = u.clan_id
         WHERE clan_id = :clan_id
         """).params(clan_id=clan_id)).fetchall()
         users = [users_in_clans[i][0] for i in range(len(users_in_clans))]
         # по полученным id произведём операции удаления пользователей из кланов
         for user in users:
-            conn.execute(text("""
+            db.session.execute(text("""
             UPDATE users SET clan_id = :clan_id WHERE id = :id""").params(clan_id=None, id=user))
-        conn.execute(text("""
+        db.session.execute(text("""
         DELETE FROM clans WHERE id = :cl_id
         """).params(cl_id=clan_id))
-        conn.commit()
+        db.session.commit()
     except RuntimeError:
         raise Exception('Something went wrong')
 
