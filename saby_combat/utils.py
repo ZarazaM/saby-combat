@@ -144,7 +144,6 @@ def purchase_user_upgrades(request: Request):
             return {'message': 'Недостаточно средств для осуществления покупки'}, 400
     return {'message': 'Incorrect request, you are not specified parameters or ids are not numeric'}, 400
 
-
 # Отправляет email сообщение со ссылкой для подтверждения аккаунта
 # на электронную почту с адресом 'to'
 def send_confirmation_email(to: str, subject: str, html_template: str) -> None:
@@ -298,7 +297,7 @@ def add_new_user(form) -> Users:
     )
     db.session.execute(insert_user_query)
 
-    # Создаю локального пользователя для работы с сессиями 
+    # Создаю локального пользователя для работы с сессиями
     user = get_user_by_username(form.username.data)
 
     # Создание записи о верефикации пользователя в бд
@@ -341,51 +340,90 @@ def add_new_user(form) -> Users:
     db.session.commit()
     return user
 
+def get_all_levels():
+    """Получить все уровни из таблицы levels"""
+    result = db.session.execute(text("SELECT id, level_name, coins_required, coins_per_click FROM levels ORDER BY id")).fetchall()
+    return result
 
-def get_user_coins():
-    """Получить запись с монетами для текущего пользователя"""
-    user_current_coins = db.session.execute(
+def get_data_for_main_page():
+    """Получить все нужные данные для главной страницы"""
+    result = db.session.execute(
         text(
             """
-            SELECT current_coins FROM user_coins WHERE user_id=:user_id
+            SELECT 
+                uc.current_coins, 
+                uc.coins_per_second, 
+                l.coins_per_click, 
+                l.level_name, 
+                l.coins_required, 
+                l.id,
+                (SELECT MAX(id) FROM levels) AS max_level
+            FROM user_coins uc
+            JOIN levels l ON uc.level_id = l.id
+            WHERE uc.user_id = :user_id
             """
         ).params(
-            user_id = current_user.id
+            user_id=current_user.id
         )
-    ).scalar()
-    return user_current_coins
+    ).fetchone()
+
+    if result:
+        return {
+             'current_coins': result[0],
+             'coins_per_second': result[1],
+             'coins_per_click': result[2],
+             'name_current_level': result[3],
+             'goal_level': result[4],
+             'current_level': result[5],
+             'max_level': result[6]
+        }
+    else:
+        return {
+            'current_coins': 0,
+            'coins_per_second': 0,
+            'coins_per_click': 0,
+            'name_current_level': 'Дрон',
+            'goal_level': 0,
+            'current_level': 1,
+            'max_level': 1
+        }
+
 
 def submit_clicks_to_db(data):
     clicks = int(data.get('clicks', 0))
-    money = int(data.get('money', 0))
-    money_per_click = 1
+    money = float(data.get('money', 0))
+    coinsPerSecondAccumulated = float(data.get('coinsPerSecondAccumulated', 0))
 
-    #рекорд за секунду 16 кликов, умножаем на 30 секунд
+    # рекорд за секунду 16 кликов, умножаем на 30 секунд
     if clicks > 480:
-        return jsonify({'status': 'error', 'message': 'Too many clicks'}), 400 #бан
+        return jsonify({'status': 'error', 'message': 'Too many clicks'}), 400  # бан
 
-    user_coins = get_user_coins()
-    #проверяем было ли вытащено user_coins
+    user_coins = get_data_for_main_page()
+    # проверяем было ли вытащено user_coins
     if user_coins is not None:
-        #Проверяем не было ли изменений в local Storage
-        if (user_coins == money - clicks * money_per_click ):
-            #Обновляем данные в бд
+        # Проверяем не было ли изменений в local Storage
+        # Клики считаются проверенными, главное чтобы были в пределе нормы; Проверяем чтобы доход пассивный был меньше равен доходу за секунду из бд * 30 (меньше равно, так как за 30 секунд пассивный доход мог измениться)
+        # Также проверяем чтобы количество монет старое из бд + доход * 30 + клики умноженное на вес были больше равно кличеству монет из local storage (Больше равно, так как за 30 секунд и вес клика и доход могли увеличиться)
+        if (coinsPerSecondAccumulated <= 30*user_coins['coins_per_second'] and user_coins['current_coins'] + user_coins['coins_per_second'] * 30 + clicks * user_coins['coins_per_click']  >= money):
+            # Обновляем данные в бд
             db.session.execute(
                 text(
                     """
                     UPDATE user_coins
                     SET total_coins = total_coins + :totalmoney, current_coins=:money, click_count= click_count + :clicks
+                    WHERE user_id = :user_id
                     """
                 ).params(
-                    totalmoney = clicks * money_per_click,
-                    money = money,
-                    clicks = clicks
+                    totalmoney=coinsPerSecondAccumulated + clicks*user_coins['coins_per_click'],
+                    money=money,
+                    clicks=clicks,
+                    user_id=current_user.id
                 )
             )
             db.session.commit()
             return jsonify({'status': 'success'})
         else:
-            return jsonify({'status': 'error', 'message': 'User менял local Storage'}), 400 #бан
+            return jsonify({'status': 'error', 'message': 'User менял local Storage'}), 400  # бан
     else:
         print(f"User {current_user.id} not found.")
         return jsonify({'status': 'error', 'message': 'User not found'}), 404
