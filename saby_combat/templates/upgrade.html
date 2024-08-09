@@ -1,41 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Income</th>
-        <th>Currently active</th>
-        <th>Buy</th>
-    </tr>
-    <tr>
-        <td>Рычаг</td>
-        <td>10</td>
-        <td>1/hour</td>
-        <td>5</td>
-        <td><button>Buy</button></td>
-    </tr>
-    <tr>
-        <td>Велосипед с генератором</td>
-        <td>100</td>
-        <td>11/hour</td>
-        <td>3</td>
-        <td><button>Buy</button></td>
-    </tr>
-    <tr>
-        <td>Водная мельница</td>
-        <td>1000</td>
-        <td>111/hour</td>
-        <td>2</td>
-        <td><button>Buy</button></td>
-    </tr>
-    <tr>
-        <td>Электростанция</td>
-        <td>10k</td>
-        <td>1.1k/hour</td>
-        <td>0</td>
-        <td><button>Buy</button></td>
-    </tr>
-</table>
+
+    <h1>Магазин улучшений</h1>
+    <div id="upgrades-container"></div>
+
+    <script>
+        $(document).ready(function() {
+            const userId = {{ user_id }};
+
+            $.ajax({
+            url: '/api/user_upgrades',
+            type: 'get',
+            data:{
+                user_id: userId
+            },
+            success: function(response){
+                response.data.forEach(upgrade => {
+                    const upgradeElement = `
+                        <div class="upgrade" id="upgrade_id_${upgrade.id}">
+                            <h2>${upgrade.upgrade_name}</h2>
+                            <p>Сейчас в наличии: ${upgrade.quantity}</p>
+                            <p>Монеты в секунду: ${upgrade.coins_per_second}</p>
+                            <p>Цена: ${upgrade.purchase_cost}</p>
+                            <button onclick="buyUpgrade(${userId}, ${upgrade.id})">Купить</button>
+                        </div>
+                        `;
+                    $('#upgrades-container').append(upgradeElement);
+                });
+            },
+            error: function(xhr) {
+                console.error('Ошибка да сколько можно');
+            }
+            });
+
+            window.buyUpgrade = function(userId, upgradeId) {
+                let params = $.param({
+                    user_id: userId,
+                    upgrade_id: upgradeId
+                });
+
+                $.ajax({
+                    url: '/api/user_upgrades?' + params,
+                    type: 'post',
+                    success: function(response) {
+                        console.log(response);
+                        $.ajax({
+                        url: '/api/user_upgrades',
+                        type: 'get',
+                        data: {
+                            user_id: userId,
+                            upgrade_id: upgradeId
+                        },
+                        success: function(response){
+                            console.log(response.data);
+                            response.data.forEach(upgrade => {
+                                console.log(upgrade);
+                                $(`#upgrade_id_${upgrade.id}`).replaceWith(`
+                                    <div class="upgrade" id="upgrade_id_${upgrade.id}">
+                                    <h2>${upgrade.upgrade_name}</h2>
+                                    <p>Сейчас в наличии: ${upgrade.quantity}</p>
+                                    <p>Монеты в секунду: ${upgrade.coins_per_second}</p>
+                                    <p>Цена: ${upgrade.purchase_cost}</p>
+                                    <button onclick="buyUpgrade(${upgrade.user_id}, ${upgrade.id})">Купить</button>
+                                    </div>
+                                `);
+                            });
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            console.error('Получена ошибка: ' + textStatus, errorThrown);
+                        }
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Ошибка: ' + textStatus, errorThrown);
+                    }
+                });
+            };
+        });
+    </script>
+
 {% endblock %}
