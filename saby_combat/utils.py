@@ -1,3 +1,4 @@
+from sqlalchemy import text
 import uuid
 from flask import jsonify, abort
 from flask_login import current_user
@@ -7,7 +8,141 @@ from saby_combat import db, app, mail, db_engine
 from sqlalchemy import text
 from werkzeug.security import generate_password_hash
 from .models import Users, UserCoins
-from . import db
+from flask import Request
+
+
+def get_upgrades(request: Request):
+    query_text = 'SELECT * FROM upgrades '
+    if request.args and 'id' in request.args:
+        upgrade_ids = request.args.getlist('id')
+        if all(value.isdigit() for value in upgrade_ids):
+            query_text += f'WHERE id IN ({", ".join(upgrade_ids)})'
+        else:
+            return {'message': 'Incorrect request, ids are not numeric'}, 400
+    with db_engine.connect() as connection:
+        query = text(query_text)
+        result = connection.execute(query)
+        return {'data': [row._asdict() for row in result]}, 200
+
+
+def delete_upgrades(request: Request):
+    if request.args and 'id' in request.args:
+        upgrade_ids = request.args.getlist('id')
+        if all(value.isdigit() for value in upgrade_ids):
+            with db_engine.connect() as connection:
+                query = text(f'DELETE FROM upgrades WHERE id IN ({", ".join(upgrade_ids)}) RETURNING *')
+                result = connection.execute(query)
+                connection.commit()
+                return {'message': 'deleted successfully', 'data': [row._asdict() for row in result]}, 200
+        return {'message': 'Incorrect request, ids are not numeric'}, 400
+    return {'message': 'You are not specified entries to delete'}, 400
+
+
+def patch_upgrades(request: Request):
+    if request.is_json:
+        upgrade_modification = request.json
+        valid_fields = {'id', 'upgrade_name', 'upgrade_image', 'base_cost', 'coins_per_second', 'cost_multiplier'}
+        invalid_fields = set(upgrade_modification.keys()) - valid_fields
+        sensitive_fields = {'id', 'base_cost', 'coins_per_second', 'cost_multiplier'}
+        valid_values = all(upgrade_modification[f'{field}'].isdigit() if field in sensitive_fields else True
+                           for field in upgrade_modification.keys())
+        if (not invalid_fields and valid_values and
+                'id' in upgrade_modification.keys() and len(upgrade_modification) >= 2):
+            upgrade_id = upgrade_modification.pop('id')
+            updates = ', '.join([f'{key} = :{key}' for key in upgrade_modification.keys()])
+            with db_engine.connect() as connection:
+                query = text(f'UPDATE upgrades SET {updates} WHERE id = {upgrade_id} RETURNING *')
+                result = connection.execute(query, upgrade_modification)
+                connection.commit()
+                return {'message': 'updated successfully', 'data': [row._asdict() for row in result]}, 200
+        return {'message': f'Incorrect request, bad datatypes or invalid parameters: {", ".join(invalid_fields)}'}, 400
+    return {'message': 'Incorrect request, request body is not json'}, 400
+
+  
+def create_upgrades(request: Request):
+    if request.is_json:
+        upgrade = request.json
+        valid_fields = {'upgrade_name', 'upgrade_image', 'base_cost', 'coins_per_second', 'cost_multiplier'}
+        invalid_fields = set(upgrade.keys()) - valid_fields
+        filled_fields = valid_fields - set(upgrade.keys()) <= {'upgrade_image'}
+        sensitive_fields = {'id', 'base_cost', 'coins_per_second', 'cost_multiplier'}
+        valid_values = all(upgrade[f'{field}'].isdigit() for field in sensitive_fields)
+        if not invalid_fields and filled_fields and valid_values:
+            columns = ', '.join(upgrade.keys())
+            placeholders = ', '.join([':' + key for key in upgrade.keys()])
+            with db_engine.connect() as connection:
+                query = text(f'INSERT INTO upgrades({columns}) '
+                         f'VALUES ({placeholders}) RETURNING *')
+                result = connection.execute(query, upgrade)
+                connection.commit()
+                return {'message': 'created successfully', 'data': [row._asdict() for row in result]}, 201
+        return {'message': f'Incorrect request, invalid parameters: {", ".join(invalid_fields)}'}, 400
+    return {'message': 'Incorrect request, request body is not json'}, 400
+
+
+def get_user_upgrades(request: Request):
+    query_text = (f'''
+    SELECT *, CAST(up.base_cost*POWER(CAST(up.cost_multiplier AS FLOAT)/CAST(100 AS FLOAT)+1, 
+    user_upgrades.quantity) AS BIGINT) as purchase_cost FROM user_upgrades JOIN (SELECT * FROM upgrades) as up ON 
+    (user_upgrades.upgrade_id = up.id) ''')
+    if (request.args and 'user_id' in request.args and request.args['user_id'].isdigit() and
+            'upgrade_id' in request.args and request.args['upgrade_id'].isdigit()):
+        query_text += (f'''WHERE user_upgrades.user_id = {request.args["user_id"]} AND 
+                       user_upgrades.upgrade_id = {request.args["upgrade_id"]}''')
+    elif request.args and 'user_id' in request.args and request.args['user_id'].isdigit():
+        query_text += f'WHERE user_upgrades.user_id = {request.args["user_id"]}'
+    with db_engine.connect() as connection:
+        query = text(query_text)
+        result = connection.execute(query)
+        return {'data': [row._asdict() for row in result]}, 200
+
+
+def patch_user_upgrades(request: Request):
+    if request.is_json:
+        modification = request.json
+        valid_fields = {'user_id', 'upgrade_id', 'quantity'}
+        invalid_fields = set(modification) - valid_fields
+        valid_values = all(modification[f'{field}'].isdigit() for field in modification)
+        if not invalid_fields and (set(modification) & valid_fields) == valid_fields and valid_values:
+            with db_engine.connect() as connection:
+                query = text(f'''UPDATE user_upgrades SET quantity = {modification["quantity"]} WHERE 
+                             user_id = {modification["user_id"]} AND 
+                             upgrade_id = {modification["upgrade_id"]} RETURNING *''')
+                result = connection.execute(query)
+                connection.commit()
+                return {'message': 'successfully updated', 'data': [row._asdict() for row in result]}
+        return {'message': f'Incorrect request, invalid parameters: {", ".join(invalid_fields)}'}
+    return {'message': 'Incorrect request, request body is not json'}, 400
+
+
+def purchase_user_upgrades(request: Request):
+    if (request.args and 'user_id' in request.args and request.args['user_id'].isdigit() and
+            'upgrade_id' in request.args and request.args['upgrade_id'].isdigit()):
+        with db_engine.connect() as connection:
+            select_query = text(
+                f'''SELECT user_coins.user_id, user_coins.current_coins, user_coins.coins_per_second as 
+                user_coins_per_second, us_up.quantity, up.base_cost, up.cost_multiplier, up.upgrade_name, 
+                up.coins_per_second FROM user_coins JOIN(SELECT * FROM user_upgrades WHERE 
+                upgrade_id = {request.args["upgrade_id"]}) as us_up ON(user_coins.user_id = us_up.user_id) 
+                JOIN(SELECT * FROM upgrades) as up ON(us_up.upgrade_id = up.id) 
+                WHERE(user_coins.user_id = {request.args["user_id"]})''')
+            result = connection.execute(select_query).first()
+            if result.current_coins >= result.base_cost * (result.cost_multiplier / 100 + 1) ** result.quantity:
+                update_quantity_query = text(
+                    f'''UPDATE user_upgrades SET quantity = {result.quantity + 1} WHERE 
+                    (user_id = {request.args["user_id"]} AND upgrade_id = {request.args["upgrade_id"]})''')
+                quantity_result = connection.execute(update_quantity_query)
+                update_coins_query = text(
+                    f'''UPDATE user_coins SET coins_per_second = {result.user_coins_per_second+result.coins_per_second}, 
+                    current_coins = {result.current_coins - result.base_cost * (result.cost_multiplier / 100 + 1) ** 
+                                     result.quantity} WHERE user_id = {request.args["user_id"]}''')
+                coins_result = connection.execute(update_coins_query)
+                connection.commit()
+                return {'message': f'Upgrade "{result.upgrade_name}" purchased by user with id {result.user_id} for '
+                                   f'{result.base_cost * (result.cost_multiplier / 100 + 1) ** result.quantity}'}, 200
+            return {'message': 'Недостаточно средств для осуществления покупки'}, 400
+    return {'message': 'Incorrect request, you are not specified parameters or ids are not numeric'}, 400
+
 
 # Отправляет email сообщение со ссылкой для подтверждения аккаунта
 # на электронную почту с адресом 'to'
@@ -107,7 +242,7 @@ def confirm_user_email(user: Users) -> None:
         return
     else:
         raise Exception(f"Пользователь c id = {user.id} не найден")
-    
+
 
 def get_user_by_username(username: Users) -> Users:
     user = db.session.query(Users).from_statement(
@@ -162,7 +297,7 @@ def add_new_user(form) -> Users:
     )
     db.session.execute(insert_user_query)
 
-    # Создаю локального пользователя для работы с сессиями 
+    # Создаю локального пользователя для работы с сессиями
     user = get_user_by_username(form.username.data)
 
     # Создание записи о верефикации пользователя в бд
@@ -205,55 +340,97 @@ def add_new_user(form) -> Users:
     db.session.commit()
     return user
 
+  
+def get_all_levels():
+    """Получить все уровни из таблицы levels"""
+    result = db.session.execute(text("SELECT id, level_name, coins_required, coins_per_click FROM levels ORDER BY id")).fetchall()
+    return result
 
-def get_user_coins():
-    """Получить запись с монетами для текущего пользователя"""
-    user_current_coins = db.session.execute(
+  
+def get_data_for_main_page():
+    """Получить все нужные данные для главной страницы"""
+    result = db.session.execute(
         text(
             """
-            SELECT current_coins FROM user_coins WHERE user_id=:user_id
+            SELECT 
+                uc.current_coins, 
+                uc.coins_per_second, 
+                l.coins_per_click, 
+                l.level_name, 
+                l.coins_required, 
+                l.id,
+                (SELECT MAX(id) FROM levels) AS max_level
+            FROM user_coins uc
+            JOIN levels l ON uc.level_id = l.id
+            WHERE uc.user_id = :user_id
             """
         ).params(
-            user_id = current_user.id
+            user_id=current_user.id
         )
-    ).scalar()
-    return user_current_coins
+    ).fetchone()
+
+    if result:
+        return {
+             'current_coins': result[0],
+             'coins_per_second': result[1],
+             'coins_per_click': result[2],
+             'name_current_level': result[3],
+             'goal_level': result[4],
+             'current_level': result[5],
+             'max_level': result[6]
+        }
+    else:
+        return {
+            'current_coins': 0,
+            'coins_per_second': 0,
+            'coins_per_click': 0,
+            'name_current_level': 'Дрон',
+            'goal_level': 0,
+            'current_level': 1,
+            'max_level': 1
+        }
+
 
 def submit_clicks_to_db(data):
     clicks = int(data.get('clicks', 0))
-    money = int(data.get('money', 0))
-    money_per_click = 1
+    money = float(data.get('money', 0))
+    coinsPerSecondAccumulated = float(data.get('coinsPerSecondAccumulated', 0))
 
-    #рекорд за секунду 16 кликов, умножаем на 30 секунд
+    # рекорд за секунду 16 кликов, умножаем на 30 секунд
     if clicks > 480:
-        return jsonify({'status': 'error', 'message': 'Too many clicks'}), 400 #бан
+        return jsonify({'status': 'error', 'message': 'Too many clicks'}), 400  # бан
 
-    user_coins = get_user_coins()
-    #проверяем было ли вытащено user_coins
+    user_coins = get_data_for_main_page()
+    # проверяем было ли вытащено user_coins
     if user_coins is not None:
-        #Проверяем не было ли изменений в local Storage
-        if (user_coins == money - clicks * money_per_click ):
-            #Обновляем данные в бд
+        # Проверяем не было ли изменений в local Storage
+        # Клики считаются проверенными, главное чтобы были в пределе нормы; Проверяем чтобы доход пассивный был меньше равен доходу за секунду из бд * 30 (меньше равно, так как за 30 секунд пассивный доход мог измениться)
+        # Также проверяем чтобы количество монет старое из бд + доход * 30 + клики умноженное на вес были больше равно кличеству монет из local storage (Больше равно, так как за 30 секунд и вес клика и доход могли увеличиться)
+        if (coinsPerSecondAccumulated <= 30*user_coins['coins_per_second'] and user_coins['current_coins'] + user_coins['coins_per_second'] * 30 + clicks * user_coins['coins_per_click']  >= money):
+            # Обновляем данные в бд
             db.session.execute(
                 text(
                     """
                     UPDATE user_coins
                     SET total_coins = total_coins + :totalmoney, current_coins=:money, click_count= click_count + :clicks
+                    WHERE user_id = :user_id
                     """
                 ).params(
-                    totalmoney = clicks * money_per_click,
-                    money = money,
-                    clicks = clicks
+                    totalmoney=coinsPerSecondAccumulated + clicks*user_coins['coins_per_click'],
+                    money=money,
+                    clicks=clicks,
+                    user_id=current_user.id
                 )
             )
             db.session.commit()
             return jsonify({'status': 'success'})
         else:
-            return jsonify({'status': 'error', 'message': 'User менял local Storage'}), 400 #бан
+            return jsonify({'status': 'error', 'message': 'User менял local Storage'}), 400  # бан
     else:
         print(f"User {current_user.id} not found.")
         return jsonify({'status': 'error', 'message': 'User not found'}), 404
 
+      
 def show_ratings():
     with (db_engine.connect() as conn):
         result_1 = conn.execute(text("SELECT ROW_NUMBER() OVER(ORDER BY user_coins.total_coins DESC), "
@@ -289,3 +466,6 @@ def show_ratings():
                                      "GROUP BY clans.id "
                                      "ORDER BY SUM(user_coins.click_count) DESC LIMIT 100"))
         return result_1, result_2, result_3, result_4
+
+      
+
