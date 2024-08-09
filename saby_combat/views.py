@@ -1,13 +1,15 @@
-from saby_combat import app, db
+from saby_combat import app, db, db_engine
 from flask import render_template, request, redirect, url_for, flash, make_response, session, jsonify
 from flask_login import login_required, login_user, current_user, logout_user
 from .models import Users, Upgrades, UserVerification, Levels, UserCoins, UserInfo, Clans
 from .forms import LoginForm, RegisterForm
-from .utils import (add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed, 
+from .utils import (add_new_user, get_user_by_username, get_user_by_email, is_user_confirmed,
                     confirm_user_email, send_confirmation_email, get_user_coins, submit_clicks_to_db, 
-                    send_referral_prize, add_friend_by_uuid, is_existing_uuid)
+                    send_referral_prize, add_friend_by_uuid, is_existing_uuid, get_upgrades, delete_upgrades,
+                    patch_upgrades, create_upgrades, get_user_upgrades, patch_user_upgrades, purchase_user_upgrades)
 from .verification_token import generate_verification_token, confirm_verification_token
 from .decorators import logout_required, confirm_your_email, admin_required
+
 
 @app.route('/', methods=['GET'])
 @login_required
@@ -16,11 +18,13 @@ def click_page():
     user_current_coins = get_user_coins()
     return render_template('click_page.html', money=user_current_coins)
 
+
 @app.route('/submit_clicks', methods=['POST'])
 @login_required
 def submit_clicks():
     data = request.json
     return submit_clicks_to_db(data)
+
 
 @app.route('/rating')
 @login_required
@@ -31,7 +35,7 @@ def rating_page():
 @app.route('/upgrade')
 @login_required
 def upgrade_page():
-    return render_template('upgrade.html')
+    return render_template('upgrade.html', user_id=current_user.id)
 
 
 @app.route('/friends')
@@ -126,4 +130,30 @@ def profile_page():
     return render_template('profile.html')
 
 
+@app.route('/api/upgrades', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+def manage_upgrades():
+    if request.method == 'POST':
+        response, status_code = create_upgrades(request)
+        return jsonify(response), status_code
+    elif request.method == 'PATCH':
+        response, status_code = patch_upgrades(request)
+        return jsonify(response), status_code
+    elif request.method == 'DELETE':
+        response, status_code = delete_upgrades(request)
+        return jsonify(response), status_code
+    else:
+        response, status_code = get_upgrades(request)
+        return jsonify(response), status_code
 
+
+@app.route('/api/user_upgrades', methods=['GET', 'POST', 'PATCH'])
+def manage_user_upgrades():
+    if request.method == 'POST':
+        response, status_code = purchase_user_upgrades(request)
+        return jsonify(response), status_code
+    elif request.method == 'PATCH':
+        response, status_code = patch_user_upgrades(request)
+        return jsonify(response), status_code
+    else:
+        response, status_code = get_user_upgrades(request)
+        return jsonify(response), status_code
