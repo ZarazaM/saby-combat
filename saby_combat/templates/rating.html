@@ -1,10 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <table>
-        <tr><th>Place</th><th>Username</th><th>Value</th></tr>
-        <tr><td>1</td><td>Petya</td><td>1000</td></tr>
-        <tr><td>2</td><td>Not Petya</td><td>100</td></tr>
-        <tr><td>3</td><td>Vasya</td><td>10</td></tr>
-    </table>
+
+<table>
+    <tr><th>Место</th><th>ФИО</th><th>Кол-во накопленных монет</th></tr>
+    {% for row in user_all_coins %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+    {% endfor %}
+</table>
+<table>
+    <tr><th>Место</th><th>ФИО</th><th>Кол-во кликов</th></tr>
+    {% for row in user_all_clicks %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+    {% endfor %}
+</table>
+<table>
+    <tr><th>Место</th><th>Название клана</th><th>Кол-во накопленных монет</th></tr>
+    {% for row in clan_all_coins %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+    {% endfor %}
+</table>
+<table>
+    <tr><th>Место</th><th>Название клана</th><th>Кол-во кликов</th></tr>
+    {% for row in clan_all_clicks %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+    {% endfor %}
+</table>
+
 {% endblock %}
