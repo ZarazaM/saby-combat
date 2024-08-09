@@ -3,6 +3,9 @@ body{
     display: flex;
     min-height: 100vh;
 }
+body::-webkit-scrollbar {
+  display: none;
+}
 @font-face {
     font-family: 'NunitoSansCondensedSemiBold';
     src: url('fonts/NunitoSans_7pt_Condensed-SemiBold.ttf') format('truetype');
@@ -145,10 +148,7 @@ main{
 
 @media screen and (max-width: 1150px) {
     .text-menu-element, .description-menu{
-        font-size: calc(5px + 0.8vw);
-    }
-    .block {
-        gap: calc(1px + 3%);
+        font-size: calc(10px + 0.6vw);
     }
     .side-decoration{
         display: none;
@@ -159,6 +159,12 @@ main{
 }
 
 @media screen and (max-width: 1000px){
+    .container-for-element-menu{
+        width: 13vw ;
+    }
+    .block-for-img{
+        margin: 0;
+    }
     body{
         flex-direction: column;
     }
@@ -168,7 +174,7 @@ main{
     .container{
         flex-direction: row;
         justify-content: space-evenly;
-        padding: 10px;
+        padding: 40px 10px;
     }
     nav{
         height: auto;
@@ -176,45 +182,46 @@ main{
     }
     .menu{
         flex-direction: row;
-            gap: 3vw;
+        gap: 3px;
+        width: 100%;
+        justify-content: space-around;
     }
     .description-menu, .container hr{
         display: none;
     }
-    .logo-sidebar h2{
-        margin: 10%;
-    }
     .logo-sidebar{
-        width: fit-content;
+        display:none;
     }
     .block{
-        width: 8.24vw;
-        padding: 5px 10px;
+        width: 100%;
+        padding: 25px 10px;
         flex-direction: column;
         justify-content: center;
     }
     .text-menu-element{
-        margin: 5px 0
+        margin: 5px 0;
+        font-size: calc(10px + 0.8vw);
     }
 }
 
-@media screen and (max-width: 770px){
-    .logo-sidebar{
-        display: none;
-    }
+@media screen and (max-width: 650px){
     .block{
-        padding: 10px 15px;
+        width: auto;
+        padding: 20px;
     }
-}
-
-@media screen and (max-width: 580px){
     .text-menu-element{
         display: none;
     }
     .block-for-img{
         margin: 0;
     }
-    .block {
-        padding: 10px;
+    .menu{
+        gap: 6px;
+    }
+}
+
+@media screen and (max-width: 570px){
+    .block{
+         padding: 10px;
     }
 }
